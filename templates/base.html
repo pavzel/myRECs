@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!--Import Google Icon Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <!-- Compiled and minified CSS from Materizlize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
+    <title>myRecs</title>
+</head>
+<body>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="" class="brand-logo">&#160;myRecs</a>
+            <a href="" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href=""><i class="material-icons">search</i><span>Find a place</span></a></li>
+                <li><a href=""><i class="material-icons">add_circle</i>Add a place</a></li>
+                <li><a href=""><i class="material-icons">thumb_up</i></a></li>
+                <li><a href=""><i class="material-icons">login</i></a></li>
+                <li><a href=""><i class="material-icons">help</i></a></li>
+            </ul>
+            <ul class="sidenav" id="mobile-demo">
+                <li><a href=""><i class="material-icons">search</i></a></li>
+                <li><a href=""><i class="material-icons">add_circle</i></a></li>
+                <li><a href=""><i class="material-icons">thumb_up</i></a></li>
+                <li><a href=""><i class="material-icons">login</i></a></li>
+                <li><a href=""><i class="material-icons">help</i></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Modified Footer from Materizlize -->
+    <footer class="page-footer">
+        <div class="footer-copyright">
+            <div class="container">
+                <em>Pavel Zelenin, 2020; e-mail: pavel.v.zelenin@gmail.com</em>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Compiled and minified JavaScript from Materizlize -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Initialization for Materizlize -->
+    <script>
+        $(document).ready(function() {
+            $('.sidenav').sidenav();
+        });
+    </script>
+
+</body>
+</html>

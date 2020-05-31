@@ -1,0 +1,14 @@
+.brand-logo {
+    padding: 5px;
+}
+
+
+.page-footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-copyright {
+    text-align: center;
+}
