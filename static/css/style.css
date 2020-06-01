@@ -1,14 +1,14 @@
-.brand-logo {
-    padding: 5px;
+body {
+    background-color: red;
 }
 
-
-.page-footer {
+footer {
     position: fixed;
     bottom: 0;
     width: 100%;
 }
 
-.footer-copyright {
+.my-signature {
     text-align: center;
+    margin-bottom: 5px;
 }

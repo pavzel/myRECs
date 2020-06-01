@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" ccontent="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <!--Import Google Icon Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <!-- Compiled and minified CSS from Materizlize -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" type="text/css">
+    <!--Import Google Icon Font 
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"> -->
+    <!-- Compiled and minified CSS from Materizlize 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" type="text/css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
     <title>myRecs</title>
 </head>
 <body>
+    <!--
     <nav>
         <div class="nav-wrapper">
             <a href="" class="brand-logo">&#160;myRecs</a>
@@ -32,31 +33,29 @@
             </ul>
         </div>
     </nav>
+    -->
 
     <main>
         {% block content %}
         {% endblock %}
     </main>
 
-    <!-- Modified Footer from Materizlize -->
-    <footer class="page-footer">
-        <div class="footer-copyright">
-            <div class="container">
-                <em>Pavel Zelenin, 2020; e-mail: pavel.v.zelenin@gmail.com</em>
-            </div>
+    <footer>
+        <div class='my-signature'>
+            <em>Pavel Zelenin, 2020; e-mail: pavel.v.zelenin@gmail.com</em>
         </div>
     </footer>
 
-
+<!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Compiled and minified JavaScript from Materizlize -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <!-- Initialization for Materizlize -->
+     Compiled and minified JavaScript from Materizlize 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
+    <!-- Initialization for Materizlize 
     <script>
         $(document).ready(function() {
             $('.sidenav').sidenav();
         });
-    </script>
+    </script> -->
 
 </body>
 </html>
