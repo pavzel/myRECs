@@ -14,7 +14,8 @@ mongodb = PyMongo(app)
 @app.route('/')
 def get_places():
     places = mongodb.db.myRecPlaces.find()
-    return render_template('places.html', places = places)
+    return render_template('places.html', places = places, stars = 1)
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
