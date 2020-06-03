@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" ccontent="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test Page</title>
+</head>
+<body>
+    <h1>Hello!</h1>
+    <div>{{ places }}</div>
+    {% for place in places %}
+        <h2>A place</h2>
+        <div>{{ place }}</div>
+        {% for key, value in place.items() %}
+            {% if key == 'my_opinion' %}
+                {{ place.my_opinion + 100 }}
+                {% for index in range(1, place.my_opinion + 1) %}
+                    <p>With my_opinion {{ index }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>
