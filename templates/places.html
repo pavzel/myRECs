@@ -5,6 +5,7 @@
         <div class="row">
             <div class="col">
                 <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
+                
                 <ol class="carousel-indicators">
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
@@ -38,7 +39,10 @@
                 <h1>My Places:</h1>
             </div>
         </div>
-
+        Hello {{ best }}
+        {% for place in best %}
+            <p>{{ place.photo_url }}</p>
+        {% endfor %}
         <div class="row">
                 {% for place in places %}
 

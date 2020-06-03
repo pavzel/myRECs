@@ -28,7 +28,8 @@ def place_details(place_id):
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    return render_template('editplacedetails.html', place = place)
+    best = find_best()
+    return render_template('editplacedetails.html', place = place, best = best)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
