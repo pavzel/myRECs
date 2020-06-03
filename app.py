@@ -11,6 +11,7 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 
 mongodb = PyMongo(app)
 
+
 @app.route('/')
 def get_places():
     places = mongodb.db.myRecPlaces.find()
