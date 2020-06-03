@@ -46,27 +46,44 @@
                         <div class="card shadow-sm">
                             <a href="#">
                                 {% if place.photo_url %}
-                                <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid" alt="">
+                                    <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid" alt="">
                                 {% else %}
-                                <img class="card-img-top" src="http://placehold.it/700x400" alt="">
+                                    <img class="card-img-top" src="http://placehold.it/700x400" alt="">
                                 {% endif %}
                             </a>
                             <div class="card-body">
-                                <h4 class="card-title">
-                                    <a href="#">{{ place.name }}</a>
-                                </h4>
+                                <div class="row">
+                                    <div class="col-7">
+                                        <h5 class="card-title">
+                                            <a href="#">{{ place.name }}</a>
+                                        </h5>
+                                    </div>
+                                    <div class="col-5">
+                                        <a class="btn btn-primary btn-sm" href="{{ url_for('place_details', place_id=place._id) }}" role="button">Details</a>
+                                        <a class="btn btn-primary btn-sm" href="#" role="button">Edit</a>
+                                    </div>
+                                </div>
                             </div>
                             <div class="card-footer">
                                 {% for key, value in place.items() %}
                                     {% if key == 'my_opinion' %}
                                         <p class="text-danger">
-                                            My opinion: {{ place.my_opinion }}
-                                            {% for i in range(place.my_opinion) %}
-                                                &#9733;
-                                            {% endfor %}
-                                            {% for i in range(3 - place.my_opinion) %}
-                                                &#9734;
-                                            {% endfor %}
+                                            My opinion: 
+                                            {% if place.my_opinion > 0 %}
+                                                +{{ place.my_opinion }}
+                                                {% for i in range(place.my_opinion) %}
+                                                    <i class="fa fa-thumbs-up"></i>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if place.my_opinion < 0 %}
+                                                {{ place.my_opinion }}
+                                                {% for i in range(-place.my_opinion) %}
+                                                    <i class="fa fa-thumbs-down"></i>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if place.my_opinion == 0 %}
+                                                {{ place.my_opinion }}
+                                            {% endif %}
                                         </p>
                                     {% endif %}
                                 {% endfor %}

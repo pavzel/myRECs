@@ -16,6 +16,11 @@ def get_places():
     places = mongodb.db.myRecPlaces.find()
     return render_template('places.html', places = places)
 
+@app.route('/place_details/<place_id>')
+def place_details(place_id):
+    place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
+    return render_template('placedetails.html', place = place)
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
