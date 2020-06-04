@@ -41,7 +41,9 @@ def update_place(place_id):
     print("To update")
     print(request.form.get('place_name'))
     places.update({"_id": ObjectId(place_id)}, {
-        'place_name': request.form.get('place_name')
+        'place_name': request.form.get('place_name'),
+        'country': request.form.get('country'),
+        'my_opinion': int(request.form.get('my_opinion'))
     })
     return redirect(url_for('get_places'))
 

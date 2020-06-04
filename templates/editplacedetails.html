@@ -22,34 +22,39 @@
                 </h1>
             </div>
 
-            {% if place.my_opinion %}
-                <p>
-                    <strong>my opinion: </strong>
-                    {% if place.my_opinion > 0 %}
-                        +{{ place.my_opinion }}
-                        {% for i in range(place.my_opinion) %}
-                            <i class="fa fa-thumbs-up"></i>
-                        {% endfor %}
-                    {% endif %}
-                    {% if place.my_opinion < 0 %}
-                        {{ place.my_opinion }}
-                        {% for i in range(-place.my_opinion) %}
-                            <i class="fa fa-thumbs-down"></i>
-                        {% endfor %}
-                    {% endif %}
-                    {% if place.my_opinion == 0 %}
-                        {{ place.my_opinion }}
-                    {% endif %}
-                </p>
-            {% endif %}
-            {% if place.country %}
-                <p><strong>country: </strong>{{ place.country }}</p>
-            {% endif %}
+            <div class="row mb-1 justify-content-between">
+                <span class="ml-1"><strong>my opinion: </strong></span>
+                {% if place.my_opinion %}
+                    <input id="my_opinion" name="my_opinion" type="text" class="validate" value="{{ place.my_opinion }}">
+                {% else %}
+                    <input id="my_opinion" name="my_opinion" type="text" class="validate" placeholder="min: -3; max: +3">
+                {% endif %}
+            </div>
+
+            <div class="row mb-1 justify-content-between">
+                <span class="ml-1"><strong>country: </strong></span>
+                {% if place.country %}
+                    <input id="country" name="country" type="text" class="validate" value="{{ place.country }}">
+                {% else %}
+                    <input id="country" name="country" type="text" class="validate" placeholder="Enter country">
+                {% endif %}
+            </div>
+
             {% if place.is_visited %}
                 <p><strong>visited: </strong>Yes</p>
             {% else %}
                 <p><strong>visited: </strong>Not yet</p>
             {% endif %}
+
+            <div class="row mb-1 justify-content-between">
+                <span class="ml-1"><strong>country: </strong></span>
+                {% if place.country %}
+                    <input id="country" name="country" type="text" class="validate" value="{{ place.country }}">
+                {% else %}
+                    <input id="country" name="country" type="text" class="validate" placeholder="Enter country">
+                {% endif %}
+            </div>
+
             {% if place.website %}
                 <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.place_name }} (link)</a></p>
             {% endif %}
