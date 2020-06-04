@@ -16,50 +16,58 @@
 
         <form action="{{ url_for('update_place', place_id=place._id) }}" method="POST" class="col-lg-3">
 
-            <div class="row">
-                <h1 class="input-field s6">
-                    <input id="place_name" name="place_name" type="text" class="validate font-weight-light col-12" value="{{ place.place_name }}">
+            <div class="form-group">
+                <h1 class="input-field">
+                    <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}">
                 </h1>
             </div>
 
-            <div class="row mb-1 justify-content-between">
-                <span class="ml-1"><strong>my opinion: </strong></span>
-                {% if place.my_opinion %}
-                    <input id="my_opinion" name="my_opinion" type="text" class="validate" value="{{ place.my_opinion }}">
-                {% else %}
-                    <input id="my_opinion" name="my_opinion" type="text" class="validate" placeholder="min: -3; max: +3">
-                {% endif %}
+            <div class="form-group">
+                <label for="my_opinion"><strong>my opinion: </strong><span id="current_opinion">{{ place.my_opinion }}</span></label>
+                <input id="my_opinion" type="range" name="my_opinion" class="custom-range" min="-3" max="3" value="{{ place.my_opinion }}">
             </div>
 
-            <div class="row mb-1 justify-content-between">
-                <span class="ml-1"><strong>country: </strong></span>
+            <div class="form-group">
+                <label for="country"><strong>country: </strong></label>
                 {% if place.country %}
-                    <input id="country" name="country" type="text" class="validate" value="{{ place.country }}">
+                    <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}">
                 {% else %}
-                    <input id="country" name="country" type="text" class="validate" placeholder="Enter country">
+                    <input id="country" type="text" name="country" class="validate form-control" placeholder="Enter country">
                 {% endif %}
             </div>
 
-            {% if place.is_visited %}
-                <p><strong>visited: </strong>Yes</p>
-            {% else %}
-                <p><strong>visited: </strong>Not yet</p>
-            {% endif %}
+            <div class="row mb-3 justify-content-between">
+                <span class="ml-3"><strong>visited: </strong></span>
+                <span class="ml-2 mr-2">Not yet</span>
+                <div class="custom-control custom-switch mr-auto">
+                    {% if place.is_visited %}
+                        <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited" checked>
+                    {% else %}
+                        <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited">
+                    {% endif %}
+                    <label class="custom-control-label" for="is_visited">Yes</label>
+                </div>
+            </div>
 
-            <div class="row mb-1 justify-content-between">
-                <span class="ml-1"><strong>country: </strong></span>
-                {% if place.country %}
-                    <input id="country" name="country" type="text" class="validate" value="{{ place.country }}">
+            <div class="form-group">
+                <label for="website"><strong>website: </strong></label>
+                {% if place.website %}
+                    <input id="website" type="text" name="website" class="validate form-control" value="{{ place.website }}">
                 {% else %}
-                    <input id="country" name="country" type="text" class="validate" placeholder="Enter country">
+                    <input id="website" type="text" name="website" class="validate form-control" placeholder="Add website URL">
                 {% endif %}
             </div>
 
-            {% if place.website %}
-                <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.place_name }} (link)</a></p>
-            {% endif %}
+            <div class="form-group">
+                <label for="photo_url"><strong>photo URL: </strong></label>
+                {% if place.photo_url %}
+                    <input id="photo_url" type="text" name="photo_url" class="validate form-control" value="{{ place.photo_url }}">
+                {% else %}
+                    <input id="photo_url" type="text" name="photo_url" class="validate form-control" placeholder="Add link to a photo">
+                {% endif %}
+            </div>
 
-            <div class="row justify-content-start">
+            <div class="row mb-1 justify-content-start">
                 <button class="btn btn-primary ml-3" type="submit" name="action">Update</button>
                 <a class="btn btn-primary ml-2" href="{{ url_for('get_places') }}">Cancel</a>
             </div>
@@ -68,4 +76,11 @@
     </div>
 
     <br>
+
+    <script>
+        const slider = document.getElementById("my_opinion");
+        const output = document.getElementById("current_opinion");
+
+        slider.oninput = function() {output.innerHTML = this.value;}
+    </script>
 {% endblock %}

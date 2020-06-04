@@ -38,12 +38,15 @@ def edit_place_details(place_id):
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
     places = mongodb.db.myRecPlaces
-    print("To update")
-    print(request.form.get('place_name'))
+    my_opinion = int(request.form.get('my_opinion'))
+    is_visited = bool(request.form.get('is_visited'))
     places.update({"_id": ObjectId(place_id)}, {
         'place_name': request.form.get('place_name'),
         'country': request.form.get('country'),
-        'my_opinion': int(request.form.get('my_opinion'))
+        'my_opinion': my_opinion,
+        'is_visited': is_visited,
+        'website': request.form.get('website'),
+        'photo_url': request.form.get('photo_url')
     })
     return redirect(url_for('get_places'))
 
