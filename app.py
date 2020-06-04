@@ -35,6 +35,16 @@ def edit_place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     return render_template('editplacedetails.html', place = place)
 
+@app.route('/update_place/<place_id>', methods=["POST"])
+def update_place(place_id):
+    places = mongodb.db.myRecPlaces
+    print("To update")
+    print(request.form.get('place_name'))
+    places.update({"_id": ObjectId(place_id)}, {
+        'place_name': request.form.get('place_name')
+    })
+    return redirect(url_for('get_places'))
+
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=os.environ.get('PORT'),

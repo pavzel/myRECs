@@ -2,58 +2,56 @@
 
 {% block content %}
     <br>
-    <!-- Page Content -->
-    <div class="container">
 
-    <!-- Heading Row -->
-    <div class="row align-items-center my-5">
-        <div class="col-lg-9">
-            {% if place.photo_url %}
-                <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.photo_url }}" alt="">
-            {% else %}
-                <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400" alt="">
-            {% endif %}
+    <div class="container">
+        <div class="row align-items-center my-5">
+
+            <div class="col-lg-9">
+                {% if place.photo_url %}
+                    <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.photo_url }}" alt="">
+                {% else %}
+                    <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400" alt="">
+                {% endif %}
+            </div>
+
+            <div class="col-lg-3">
+                <h1 class="font-weight-light">{{ place.place_name }}</h1>
+                {% if place.my_opinion %}
+                    <p>
+                        <strong>my opinion: </strong>
+                        {% if place.my_opinion > 0 %}
+                            +{{ place.my_opinion }}
+                            {% for i in range(place.my_opinion) %}
+                                <i class="fa fa-thumbs-up"></i>
+                            {% endfor %}
+                        {% endif %}
+                        {% if place.my_opinion < 0 %}
+                            {{ place.my_opinion }}
+                            {% for i in range(-place.my_opinion) %}
+                                <i class="fa fa-thumbs-down"></i>
+                            {% endfor %}
+                        {% endif %}
+                        {% if place.my_opinion == 0 %}
+                            {{ place.my_opinion }}
+                        {% endif %}
+                    </p>
+                {% endif %}
+                {% if place.country %}
+                    <p><strong>country: </strong>{{ place.country }}</p>
+                {% endif %}
+                {% if place.is_visited %}
+                    <p><strong>visited: </strong>Yes</p>
+                {% else %}
+                    <p><strong>visited: </strong>Not yet</p>
+                {% endif %}
+                {% if place.website %}
+                    <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.place_name }} (link)</a></p>
+                {% endif %}
+                <a class="btn btn-primary" href="{{ url_for('get_places') }}">Back</a>
+            </div>
+
         </div>
-      <!-- /.col-lg-8 -->
-      <div class="col-lg-3">
-        <h1 class="font-weight-light">{{ place.name }}</h1>
-        {% if place.my_opinion %}
-            <p>
-                <strong>my opinion: </strong>
-                {% if place.my_opinion > 0 %}
-                    +{{ place.my_opinion }}
-                    {% for i in range(place.my_opinion) %}
-                        <i class="fa fa-thumbs-up"></i>
-                    {% endfor %}
-                {% endif %}
-                {% if place.my_opinion < 0 %}
-                    {{ place.my_opinion }}
-                    {% for i in range(-place.my_opinion) %}
-                        <i class="fa fa-thumbs-down"></i>
-                    {% endfor %}
-                {% endif %}
-                {% if place.my_opinion == 0 %}
-                    {{ place.my_opinion }}
-                {% endif %}
-            </p>
-        {% endif %}
-        {% if place.country %}
-            <p><strong>country: </strong>{{ place.country }}</p>
-        {% endif %}
-        {% if place.is_visited %}
-            <p><strong>visited: </strong>Yes</p>
-        {% else %}
-            <p><strong>visited: </strong>Not yet</p>
-        {% endif %}
-        {% if place.website %}
-            <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.name }} (link)</a></p>
-        {% endif %}
-        <a class="btn btn-primary" href="{{ url_for('get_places') }}">Back</a>
-      </div>
-      <!-- /.col-md-4 -->
     </div>
-    <!-- /.row -->
 
     <br>
-
 {% endblock %}
