@@ -11,14 +11,19 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 
 mongodb = PyMongo(app)
 
-def find_best():
-    return mongodb.db.myRecPlaces.find({"my_opinion": 3})
+def find_photo_url(key, value):
+    best_places = mongodb.db.myRecPlaces.find({key: value})
+    best_place_images = []
+    for place in best_places:
+        if "photo_url" in place.keys():
+            best_place_images.append(place["photo_url"])
+    return best_place_images
 
 @app.route('/')
 def get_places():
     places = mongodb.db.myRecPlaces.find()
-    best = find_best()
-    return render_template('places.html', places = places, best = best)
+    best_place_images = find_photo_url("my_opinion", 3)
+    return render_template('places.html', places = places, best_place_images = best_place_images)
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
@@ -28,8 +33,7 @@ def place_details(place_id):
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    best = find_best()
-    return render_template('editplacedetails.html', place = place, best = best)
+    return render_template('editplacedetails.html', place = place)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
