@@ -74,15 +74,23 @@ def insert_place():
     })
     return redirect(url_for('get_places'))
 
+@app.route('/delete_place/<place_id>')
+def delete_place(place_id):
+    mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
+    return redirect(url_for('get_places'))
+
 @app.route('/browse')
 def browse():
     active_tags = ["", "", "active", "", "", ""]
     return render_template("browse.html", active_tags = active_tags)
 
-@app.route('/delete_place/<place_id>')
-def delete_place(place_id):
-    mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
-    return redirect(url_for('get_places'))
+@app.route('/get_selested_places', methods=["POST"])
+def get_selected_places():
+    """places = mongodb.db.myRecPlaces.find()"""
+    places = mongodb.db.myRecPlaces.find({"country": request.form.get('country')})
+    best_place_images = find_photo_url("my_opinion", 3)
+    active_tags = ["active", "", "", "", "", ""]
+    return render_template('places.html', title = "Selected places", places = places, best_place_images = best_place_images, active_tags = active_tags)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
