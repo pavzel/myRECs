@@ -26,15 +26,18 @@
                 </a>
             </li>
             <li class="nav-item {{ active_tags[1] }}">
-                <a class="nav-link" href="{{ url_for('add_place') }}">Add Place</a>
+                <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
             </li>
             <li class="nav-item {{ active_tags[2] }}">
-                <a class="nav-link" href="#">Get Recommendations</a>
+                <a class="nav-link" href="{{ url_for('browse') }}">Browse</a>
             </li>
             <li class="nav-item {{ active_tags[3] }}">
-                <a class="nav-link" href="#">Login</a>
+                <a class="nav-link" href="#">Recommendations</a>
             </li>
             <li class="nav-item {{ active_tags[4] }}">
+                <a class="nav-link" href="#">Login</a>
+            </li>
+            <li class="nav-item {{ active_tags[5] }}">
                 <a class="nav-link" href="#">Help</a>
             </li>
             </ul>

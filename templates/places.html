@@ -35,7 +35,7 @@
 
         <div class="row">
             <div class="col">
-                <h1>All Places:</h1>
+                <h1>{{ title }}:</h1>
             </div>
         </div>
 
@@ -53,14 +53,18 @@
                             </a>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-7">
+                                    <div class="col-6">
                                         <h5 class="card-title">
                                             <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
                                         </h5>
                                     </div>
-                                    <div class="col-5">
-                                        <a class="btn btn-primary btn-sm" href="{{ url_for('place_details', place_id=place._id) }}" role="button">Details</a>
-                                        <a class="btn btn-primary btn-sm" href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
+                                    <div class="col-6">
+                                        <div class="row justify-content-end">
+                                            <a class="btn btn-primary btn-sm mr-2"
+                                                href="{{ url_for('place_details', place_id=place._id) }}" role="button">Details</a>
+                                            <a class="btn btn-primary btn-sm mr-2"
+                                                href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
