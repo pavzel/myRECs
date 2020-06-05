@@ -23,17 +23,20 @@ def find_photo_url(key, value):
 def get_places():
     places = mongodb.db.myRecPlaces.find()
     best_place_images = find_photo_url("my_opinion", 3)
-    return render_template('places.html', places = places, best_place_images = best_place_images)
+    active_tags = ["active", "", "", "", ""]
+    return render_template('places.html', places = places, best_place_images = best_place_images, active_tags = active_tags)
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    return render_template('placedetails.html', place = place)
+    active_tags = ["active", "", "", "", ""]
+    return render_template('placedetails.html', place = place, active_tags = active_tags)
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    return render_template('editplacedetails.html', place = place)
+    active_tags = ["active", "", "", "", ""]
+    return render_template('editplacedetails.html', place = place, active_tags = active_tags)
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
@@ -49,6 +52,27 @@ def update_place(place_id):
         'photo_url': request.form.get('photo_url')
     })
     return redirect(url_for('get_places'))
+
+@app.route('/add_place')
+def add_place():
+    active_tags = ["", "active", "", "", ""]
+    return render_template("addplace.html", active_tags = active_tags)
+
+@app.route('/insert_place', methods=["POST"])
+def insert_place():
+    places = mongodb.db.myRecPlaces
+    my_opinion = int(request.form.get('my_opinion'))
+    is_visited = bool(request.form.get('is_visited'))
+    places.insert_one({
+        'place_name': request.form.get('place_name'),
+        'country': request.form.get('country'),
+        'my_opinion': my_opinion,
+        'is_visited': is_visited,
+        'website': request.form.get('website'),
+        'photo_url': request.form.get('photo_url')
+    })
+    return redirect(url_for('get_places'))
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
