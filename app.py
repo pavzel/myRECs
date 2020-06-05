@@ -81,8 +81,10 @@ def delete_place(place_id):
 
 @app.route('/browse')
 def browse():
+    """countries = ["Sweden", "Germany"]"""
     active_tags = ["", "", "active", "", "", ""]
-    return render_template("browse.html", active_tags = active_tags)
+    countries = mongodb.db.countries.find()
+    return render_template("browse.html", active_tags = active_tags, countries = countries)
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
