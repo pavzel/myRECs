@@ -55,7 +55,7 @@
                                 <div class="row">
                                     <div class="col-7">
                                         <h5 class="card-title">
-                                            <a href="#">{{ place.place_name }}</a>
+                                            <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
                                         </h5>
                                     </div>
                                     <div class="col-5">

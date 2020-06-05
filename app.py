@@ -29,13 +29,13 @@ def get_places():
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    active_tags = ["active", "", "", "", ""]
+    active_tags = ["", "", "", "", ""]
     return render_template('placedetails.html', place = place, active_tags = active_tags)
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    active_tags = ["active", "", "", "", ""]
+    active_tags = ["", "", "", "", ""]
     return render_template('editplacedetails.html', place = place, active_tags = active_tags)
 
 @app.route('/update_place/<place_id>', methods=["POST"])
@@ -73,6 +73,10 @@ def insert_place():
     })
     return redirect(url_for('get_places'))
 
+@app.route('/delete_place/<place_id>')
+def delete_place(place_id):
+    mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
+    return redirect(url_for('get_places'))
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
