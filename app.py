@@ -21,8 +21,8 @@ def find_photo_url(key, value):
 
 @app.route('/')
 def get_places():
-    """places = mongodb.db.myRecPlaces.find()"""
-    places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })
+    places = mongodb.db.myRecPlaces.find()
+    """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
     best_place_images = find_photo_url("my_opinion", 3)
     active_tags = ["active", "", "", "", "", ""]
     return render_template('places.html', title = "All places", places = places, best_place_images = best_place_images, active_tags = active_tags)
@@ -88,8 +88,8 @@ def browse():
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
-    """places = mongodb.db.myRecPlaces.find()"""
-    places = mongodb.db.myRecPlaces.find({"country": request.form.get('country')})
+    list_of_countries = request.form.getlist('country')
+    places = mongodb.db.myRecPlaces.find({"country": { "$in": list_of_countries } })
     best_place_images = find_photo_url("my_opinion", 3)
     active_tags = ["active", "", "", "", "", ""]
     return render_template('places.html', title = "Selected places", places = places, best_place_images = best_place_images, active_tags = active_tags)
