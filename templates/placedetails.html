@@ -47,7 +47,11 @@
                 {% if place.website %}
                     <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.place_name }} (link)</a></p>
                 {% endif %}
-                <a class="btn btn-primary" href="{{ url_for('get_places') }}">Back</a>
+                <div class="row justify-content-start">
+                    <a class="btn btn-primary btn ml-3" href="{{ url_for('get_places') }}" role="button">Back</a>
+                    <a class="btn btn-primary btn ml-2" href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
+                </div>
+
             </div>
 
         </div>

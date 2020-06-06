@@ -1,4 +1,5 @@
 import os
+import random
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
@@ -17,6 +18,7 @@ def find_photo_url(key, value):
     for place in best_places:
         if "photo_url" in place.keys():
             best_place_images.append(place["photo_url"])
+    random.shuffle(best_place_images)
     return best_place_images
 
 @app.route('/')
