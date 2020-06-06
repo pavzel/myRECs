@@ -21,7 +21,7 @@ def find_photo_url(key, value):
 
 @app.route('/')
 def get_places():
-    places = mongodb.db.myRecPlaces.find()
+    places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)
     """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
     best_place_images = find_photo_url("my_opinion", 3)
     active_tags = ["active", "", "", "", "", ""]
@@ -44,13 +44,13 @@ def update_place(place_id):
     places = mongodb.db.myRecPlaces
     my_opinion = int(request.form.get('my_opinion'))
     is_visited = bool(request.form.get('is_visited'))
-    places.update({"_id": ObjectId(place_id)}, {
+    places.update_one({"_id": ObjectId(place_id)}, { "$set": {
         'place_name': request.form.get('place_name'),
         'country': request.form.get('country'),
         'my_opinion': my_opinion,
         'is_visited': is_visited,
         'website': request.form.get('website'),
-        'photo_url': request.form.get('photo_url')
+        'photo_url': request.form.get('photo_url') }
     })
     return redirect(url_for('get_places'))
 

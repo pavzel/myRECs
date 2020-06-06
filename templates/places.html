@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
     <div class="container">
         <div class="row">
             <div class="col">
@@ -39,10 +40,11 @@
             </div>
         </div>
 
-        <div class="row">
-                {% for place in places %}
+        <div class="row mb-3">
 
-                    <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card-columns">
+                {% for place in places %}
+                    <div class="col mb-3">
                         <div class="card shadow-sm">
                             <a href="#">
                                 {% if place.photo_url %}
@@ -53,12 +55,12 @@
                             </a>
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-7">
                                         <h5 class="card-title">
                                             <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
                                         </h5>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-5">
                                         <div class="row justify-content-end">
                                             <a class="btn btn-primary btn-sm mr-2"
                                                 href="{{ url_for('place_details', place_id=place._id) }}" role="button">Details</a>
@@ -94,8 +96,9 @@
                             </div>
                         </div>
                     </div>
-
                 {% endfor %}
+            </div>
+
         </div>
         <br>
     </div>
