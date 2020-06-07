@@ -32,7 +32,7 @@
                 <label for="country"><strong>select countries: </strong></label>
                 <select multiple id="country" name="country" class="form-control">
                     {% for country in countries %}
-                        <option value="{{ country.country_name }}">{{ country.country_name }}</option>
+                        <option value="{{ country.country_name }}" selected>{{ country.country_name }}</option>
                     {% endfor %}
                 </select>
             </div>

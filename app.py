@@ -27,7 +27,8 @@ def get_places():
     index_max = 20
     print("N of documents")
     print(mongodb.db.myRecPlaces.count_documents({}))
-    places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)[index_min:index_max]
+    places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)
+    """places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)[index_min:index_max]"""
     """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
     best_place_images = find_photo_url("my_opinion", 3)
     active_tags = ["active", "", "", "", "", ""]
@@ -85,12 +86,13 @@ def delete_place(place_id):
     mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
     return redirect(url_for('get_places'))
 
-@app.route('/browse')
-def browse():
-    """countries = ["Sweden", "Germany"]"""
+@app.route('/search')
+def search():
     active_tags = ["", "", "active", "", "", ""]
-    countries = mongodb.db.countries.find()
-    return render_template("browse.html", active_tags = active_tags, countries = countries)
+    countries = mongodb.db.countries.find().sort("country_name")
+    print("countries:")
+    print(countries)
+    return render_template("search.html", active_tags = active_tags, countries = countries)
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
