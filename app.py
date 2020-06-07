@@ -14,6 +14,7 @@ mongodb = PyMongo(app)
 
 countries_to_display = []
 title_to_display = "All places"
+page_number = 1
 
 def find_photo_url(key, value):
     best_places = mongodb.db.myRecPlaces.find({key: value})
@@ -25,24 +26,41 @@ def find_photo_url(key, value):
     return best_place_images
 
 @app.route('/')
-def get_all_places():
+def home():
+    global page_number
+    page_number = 1
+    return redirect(url_for('get_all_places', page_increment = 0))
+
+@app.route('/<page_increment>')
+def get_all_places(page_increment):
     global countries_to_display
+    global page_number
     global title_to_display
+    print("Page increment:")
+    print(page_increment)
     title_to_display = "All places"
-    """
-    print("N of documents")
-    print(mongodb.db.myRecPlaces.count_documents({}))
-    """
+    page_number = 1
     countries = mongodb.db.countries.find().sort("country_name", -1)
     for country in countries:
         countries_to_display.append(country["country_name"])
+    print("Selected countries:")
+    print(countries_to_display)
     return redirect(url_for('display_places'))
 
 @app.route('/display_places')
 def display_places():
     global countries_to_display
     global title_to_display
-    places = mongodb.db.myRecPlaces.find({"country": { "$in": countries_to_display } }).sort("my_opinion", -1)
+    global page_number
+    print("Global page #")
+    print(page_number)
+    print("N of selected documents")
+    number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": countries_to_display } })
+    index_min = 15 * page_number
+    index_max = 15 * (page_number + 1)
+    print(index_min, index_max)
+    places = mongodb.db.myRecPlaces.find({"country": { "$in": countries_to_display } }).sort("my_opinion", -1)[index_min:index_max]
+
     """places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)"""
     """index_min = 0
     index_max = 20
@@ -114,7 +132,9 @@ def search():
 def get_selected_places():
     global countries_to_display
     global title_to_display
+    global page_number
     title_to_display = "Selected places"
+    page_number = 0
     countries_to_display = request.form.getlist('country')
     return redirect(url_for('display_places'))
 
