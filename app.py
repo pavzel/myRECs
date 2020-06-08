@@ -1,4 +1,5 @@
 import os
+import math
 import random
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
@@ -12,9 +13,13 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 
 mongodb = PyMongo(app)
 
-countries_to_display = []
-title_to_display = "All places"
-page_number = 1
+params = {  "countries_to_display": [],
+                "active_nav": ["active", "", "", "", "", ""],
+                "best_place_images": [],
+                "title_to_display": "All places",
+                "per_page": 15,
+                "max_page": 1,
+                "curr_page": 1}
 
 def find_photo_url(key, value):
     best_places = mongodb.db.myRecPlaces.find({key: value})
@@ -27,60 +32,50 @@ def find_photo_url(key, value):
 
 @app.route('/')
 def home():
-    global page_number
-    page_number = 1
+    global params
+    params["curr_page"] = 1
     return redirect(url_for('get_all_places', page_increment = 0))
 
 @app.route('/<page_increment>')
 def get_all_places(page_increment):
-    global countries_to_display
-    global page_number
-    global title_to_display
+    global params
     print("Page increment:")
     print(page_increment)
-    title_to_display = "All places"
-    page_number = 1
-    countries = mongodb.db.countries.find().sort("country_name", -1)
+    params["title_to_display"] = "All places"
+    params["curr_page"] = 1
+    params["countries_to_display"].clear()
+    countries = mongodb.db.countries.find().sort("country_name")
     for country in countries:
-        countries_to_display.append(country["country_name"])
-    print("Selected countries:")
-    print(countries_to_display)
+        params["countries_to_display"].append(country["country_name"])
     return redirect(url_for('display_places'))
 
 @app.route('/display_places')
 def display_places():
-    global countries_to_display
-    global title_to_display
-    global page_number
-    print("Global page #")
-    print(page_number)
-    print("N of selected documents")
-    number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": countries_to_display } })
-    index_min = 15 * page_number
-    index_max = 15 * (page_number + 1)
+    global params
+    number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
+    params["max_page"] = math.ceil(number_of_places_to_display / params["per_page"])
+    index_min = params["per_page"] * (params["curr_page"] - 1)
+    index_max = params["per_page"] * params["curr_page"]
     print(index_min, index_max)
-    places = mongodb.db.myRecPlaces.find({"country": { "$in": countries_to_display } }).sort("my_opinion", -1)[index_min:index_max]
-
-    """places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)"""
-    """index_min = 0
-    index_max = 20
-    places = mongodb.db.myRecPlaces.find().sort("my_opinion", -1)[index_min:index_max]"""
+    places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("my_opinion", -1)[index_min:index_max]
     """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
-    best_place_images = find_photo_url("my_opinion", 3)
-    active_tags = ["active", "", "", "", "", ""]
-    return render_template('places.html', title = title_to_display, places = places, best_place_images = best_place_images, active_tags = active_tags)
+    params["active_nav"] = ["active", "", "", "", "", ""]
+    params["best_place_images"] = find_photo_url("my_opinion", 3)
+    return render_template('places.html', places = places, params = params)
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
+    global params
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    active_tags = ["", "", "", "", "", ""]
-    return render_template('placedetails.html', place = place, active_tags = active_tags)
+    params["active_nav"] = ["", "", "", "", "", ""]
+    return render_template('placedetails.html', place = place, params = params)
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
+    global params
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    active_tags = ["", "", "", "", "", ""]
-    return render_template('editplacedetails.html', place = place, active_tags = active_tags)
+    params["active_nav"] = ["", "", "", "", "", ""]
+    return render_template('editplacedetails.html', place = place, params = params)
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
@@ -99,8 +94,9 @@ def update_place(place_id):
 
 @app.route('/add_place')
 def add_place():
-    active_tags = ["", "active", "", "", "", ""]
-    return render_template("addplace.html", active_tags = active_tags)
+    global params
+    params["active_nav"] = ["", "active", "", "", "", ""]
+    return render_template("addplace.html", params = params)
 
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
@@ -124,18 +120,17 @@ def delete_place(place_id):
 
 @app.route('/search')
 def search():
-    active_tags = ["", "", "active", "", "", ""]
+    global params
+    params["active_nav"] = ["", "", "active", "", "", ""]
     countries = mongodb.db.countries.find().sort("country_name")
-    return render_template("search.html", active_tags = active_tags, countries = countries)
+    return render_template("search.html", params = params, countries = countries)
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
-    global countries_to_display
-    global title_to_display
-    global page_number
-    title_to_display = "Selected places"
-    page_number = 0
-    countries_to_display = request.form.getlist('country')
+    global params
+    params["title_to_display"] = "Selected places"
+    params["curr_page"] = 1
+    params["countries_to_display"] = request.form.getlist('country')
     return redirect(url_for('display_places'))
 
 

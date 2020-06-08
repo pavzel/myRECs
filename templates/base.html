@@ -20,24 +20,24 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
-            <li class="nav-item {{ active_tags[0] }}">
+            <li class="nav-item {{ params.active_nav[0] }}">
                 <a class="nav-link" href="{{ url_for('home') }}">Home
                 <span class="sr-only">(current)</span>
                 </a>
             </li>
-            <li class="nav-item {{ active_tags[1] }}">
+            <li class="nav-item {{ params.active_nav[1] }}">
                 <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
             </li>
-            <li class="nav-item {{ active_tags[2] }}">
+            <li class="nav-item {{ params.active_nav[2] }}">
                 <a class="nav-link" href="{{ url_for('search') }}">Search</a>
             </li>
-            <li class="nav-item {{ active_tags[3] }}">
+            <li class="nav-item {{ params.active_nav[3] }}">
                 <a class="nav-link" href="#">Recommendations</a>
             </li>
-            <li class="nav-item {{ active_tags[4] }}">
+            <li class="nav-item {{ params.active_nav[4] }}">
                 <a class="nav-link" href="#">Login</a>
             </li>
-            <li class="nav-item {{ active_tags[5] }}">
+            <li class="nav-item {{ params.active_nav[5] }}">
                 <a class="nav-link" href="#">Help</a>
             </li>
             </ul>
