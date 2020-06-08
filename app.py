@@ -4,7 +4,10 @@ import random
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-import env as config
+#import env as config
+if os.path.exists("env.py"):
+    import env
+
 
 app = Flask(__name__)
 
@@ -22,8 +25,8 @@ params = {  "countries_to_display": [],
                 "max_page": 1,
                 "curr_page": 1}
 
-def find_photo_url(key, value):
-    best_places = mongodb.db.myRecPlaces.find({key: value})
+def find_photo_url(value):
+    best_places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": value } })
     best_place_images = []
     for place in best_places:
         if "photo_url" in place.keys():
@@ -47,7 +50,7 @@ def get_all_places():
 def display_places(page_number):
     global params
     params["nav_active_curr"] = params["nav_active_main"]
-    params["best_place_images"] = find_photo_url("my_opinion", 3)
+    params["best_place_images"] = find_photo_url(2)
     number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
     params["max_page"] = math.ceil(number_of_places_to_display / params["per_page"])
     params["curr_page"] = int(page_number)
@@ -133,4 +136,4 @@ def get_selected_places():
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=os.environ.get('PORT'),
-            debug=True)
+            debug=False)
