@@ -103,11 +103,25 @@
 
     <nav aria-label="Page navigation example">
         <ul class="pagination pagination-sm justify-content-center pb-5">
-            <li class="page-item"><a class="page-link" href="#">First</a></li>
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item active"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            <li class="page-item disabled"><a class="page-link" href="#">Last</a></li>
+            {% if (params.curr_page > 1) %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('display_places', page_number=1) }}">First</a></li>
+                <li class="page-item"><a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page-1) }}">Previous</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="">First</a></li>
+                <li class="page-item disabled"><a class="page-link" href="">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><a class="page-link text-white bg-primary" href="">Page {{ params.curr_page }}</a></li>
+            {% if (params.curr_page < params.max_page) %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page+1) }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('display_places', page_number=params.max_page) }}">Last ({{ params.max_page }})</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="">Next</a></li>
+                <li class="page-item disabled"><a class="page-link" href="">Last ({{ params.max_page }})</a></li>
+            {% endif %}
         </ul>
     </nav>
 
