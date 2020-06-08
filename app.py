@@ -4,7 +4,6 @@ import random
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-#import env as config
 if os.path.exists("env.py"):
     import env
 
@@ -29,10 +28,16 @@ def find_photo_url(value):
     best_places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": value } })
     best_place_images = []
     for place in best_places:
-        if "photo_url" in place.keys():
+        if 'photo_url' in place.keys():
             best_place_images.append(place["photo_url"])
     random.shuffle(best_place_images)
     return best_place_images
+
+def update_countries(country):
+    is_in_db = mongodb.db.countries.count_documents({"country_name": country})
+    if is_in_db == 0:
+        countries = mongodb.db.countries
+        countries.insert_one({ 'country_name': country })
 
 @app.route('/')
 def get_all_places():
@@ -78,11 +83,15 @@ def edit_place_details(place_id):
 def update_place(place_id):
     global params
     places = mongodb.db.myRecPlaces
+    country = request.form.get('country')
+    if country == '':
+        country = 'not sure'
+    update_countries(country)
     my_opinion = int(request.form.get('my_opinion'))
     is_visited = bool(request.form.get('is_visited'))
     places.update_one({"_id": ObjectId(place_id)}, { "$set": {
         'place_name': request.form.get('place_name'),
-        'country': request.form.get('country'),
+        'country': country,
         'my_opinion': my_opinion,
         'is_visited': is_visited,
         'website': request.form.get('website'),
@@ -99,17 +108,21 @@ def add_place():
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
     places = mongodb.db.myRecPlaces
+    country = request.form.get('country')
+    if country == '':
+        country = 'not sure'
+    update_countries(country)
     my_opinion = int(request.form.get('my_opinion'))
     is_visited = bool(request.form.get('is_visited'))
     places.insert_one({
         'place_name': request.form.get('place_name'),
-        'country': request.form.get('country'),
+        'country': country,
         'my_opinion': my_opinion,
         'is_visited': is_visited,
         'website': request.form.get('website'),
         'photo_url': request.form.get('photo_url')
     })
-    return redirect(url_for('display_places', page_number=params["curr_page"]))
+    return redirect(url_for('get_all_places'))
 
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
@@ -136,4 +149,4 @@ def get_selected_places():
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=os.environ.get('PORT'),
-            debug=False)
+            debug=True)
