@@ -53,7 +53,15 @@
                 </div>
 
             </div>
+        </div>
 
+        <div class="row align-items-center my-5">
+            <div class="col">
+                {% if place.comment %}
+                    <p><strong>comments: </strong></p>
+                    <p>{{ place.comment }}</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 

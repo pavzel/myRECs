@@ -95,7 +95,8 @@ def update_place(place_id):
         'my_opinion': my_opinion,
         'is_visited': is_visited,
         'website': request.form.get('website'),
-        'photo_url': request.form.get('photo_url') }
+        'photo_url': request.form.get('photo_url'),
+        'comment': request.form.get('comment') }
     })
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
@@ -120,7 +121,8 @@ def insert_place():
         'my_opinion': my_opinion,
         'is_visited': is_visited,
         'website': request.form.get('website'),
-        'photo_url': request.form.get('photo_url')
+        'photo_url': request.form.get('photo_url'),
+        'comment': request.form.get('comment')
     })
     return redirect(url_for('get_all_places'))
 
