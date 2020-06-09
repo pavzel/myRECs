@@ -147,6 +147,29 @@ def get_selected_places():
     params["countries_to_display"] = request.form.getlist('country')
     return redirect(url_for('display_places', page_number=1))
 
+@app.route('/login')
+def login():
+    global params
+    number_of_matches = mongodb.db.users.count_documents({"user_name": "vsc731109"})
+    if number_of_matches == 1:
+        for item in mongodb.db.users.find({"user_name": "vsc731109"}):
+            user = item
+            print("User:", user)
+    else:
+        print('Number of matches:', number_of_matches)
+    
+    user_id = user['_id']
+    user_name = user['user_name']
+    print(user_id)
+    print(user_name)
+
+    users = mongodb.db.users
+    users.insert_one({
+        'username': user_name,
+        'password': 'pass1'
+    })
+
+    return render_template("login.html", params = params)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
