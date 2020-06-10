@@ -69,41 +69,9 @@ def display_places(page_number):
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     global params
-    place_cursor = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    place = place_cursor
-    place_dict = {}
-    for key in place:
-        place_dict[key] = place[key]
-    place_dict2 = {}
-    place_dict2['i_spoke'] = False
-    place_dict2['place_name'] = place_dict['place_name']
-    place_dict2['country'] = place_dict['country']
-    #if place_dict['added_by'] == params['username']:
-    #    print('Logged in user spoke')
-    #    place_dict2['my_opinion'] = place_dict['users'][params['username']]['my_opinion']
-    place_dict2['opinion'] = 0
-    place_dict2['opinions'] = []
-    place_dict2['photo_urls'] = []
-    place_dict2['websites'] = []
-    place_dict2['comments'] = []
-    users = place_dict['users']
-    for user in users:
-        place_dict2['opinion'] += int(users[user]['my_opinion'])
-        place_dict2['opinions'].append(int(users[user]['my_opinion']))
-        place_dict2['photo_urls'].append(users[user]['photo_url'])
-        place_dict2['websites'].append(users[user]['website'])
-        place_dict2['comments'].append(users[user]['comment'])
-        if user == params['username']:
-            place_dict2['i_spoke'] = True
-    place_dict2['opinion'] /= len(place_dict2['opinions'])
-    if place_dict2['opinion'] > 0:
-        place_dict2['opinion_str'] = '+' + str(round(place_dict2['opinion'], 2))
-    else:
-        place_dict2['opinion_str'] = str(round(place_dict2['opinion'], 2))
-    place_dict2['opinion_int'] = int(round(place_dict2['opinion']))
-    print('Place dict2:', place_dict2)
+    place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     params["nav_active_curr"] = ["", "", "", "", "", ""]
-    return render_template('placedetails.html', place = place_dict2, params = params)
+    return render_template('placedetails.html', place = place, params = params)
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):

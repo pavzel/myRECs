@@ -7,8 +7,8 @@
         <div class="row align-items-center my-5">
 
             <div class="col-lg-9">
-                {% if place.photo_urls[0] %}
-                    <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.photo_urls[0] }}">
+                {% if place.photo_url %}
+                    <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.photo_url }}">
                 {% else %}
                     <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400">
                 {% endif %}
@@ -16,7 +16,6 @@
 
             <div class="col-lg-3">
                 <h1 class="font-weight-light">{{ place.place_name }}</h1>
-
                 {% if place.my_opinion %}
                     <p>
                         <strong>my opinion: </strong>
@@ -37,7 +36,6 @@
                         {% endif %}
                     </p>
                 {% endif %}
-<!--
                 {% if place.country %}
                     <p><strong>country: </strong>{{ place.country }}</p>
                 {% endif %}
@@ -55,9 +53,8 @@
                 </div>
 
             </div>
--->
         </div>
-<!--
+
         <div class="row align-items-center my-5">
             <div class="col">
                 {% if place.comment %}
@@ -66,7 +63,6 @@
                 {% endif %}
             </div>
         </div>
--->
     </div>
 
     <br>
