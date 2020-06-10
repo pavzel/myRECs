@@ -56,6 +56,7 @@ def get_all_places():
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
     global params
+    params['login_problem'] = False
     params["nav_active_curr"] = params["nav_active_main"]
     params["best_place_images"] = find_photo_url(2)
     number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
@@ -160,26 +161,15 @@ def sign_in():
     global params
     users = mongodb.db.users
     username = request.form.get('username')
+    password = request.form.get('password')
     if users.count_documents({"username": username}) == 1:
-        params['username'] = username
-        params['login_problem'] = False
-        return redirect(url_for('get_all_places'))
-    else:
-        params['login_problem'] = True
-        return render_template("login.html", params = params)
-    """
-    number_of_matches = mongodb.db.users.count_documents({"username": "vsc731109"})
-    if number_of_matches == 1:
-        user = mongodb.db.users.find_one({"username": "user1"})
-        print("UserID:", user['_id'])
-    else:
-        print('Number of matches:', number_of_matches)
-    users = mongodb.db.users
-    users.insert_one({
-        'username': user_name,
-        'password': 'pass1'
-    })
-    """
+        user = users.find_one({"username": username})
+        if user['password'] == password:
+            params['username'] = username
+            params['login_problem'] = False
+            return redirect(url_for('get_all_places'))
+    params['login_problem'] = True
+    return render_template("login.html", params = params)
 
 @app.route('/logout')
 def logout():
