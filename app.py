@@ -190,7 +190,7 @@ def insert_user():
     users = mongodb.db.users
     username = request.form.get('username')
     password = request.form.get('password')
-    if users.count_documents({"username": username}) == 0:
+    if users.count_documents({"username": username}) == 0 and username != '':
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem = False))
     return render_template("signup.html", params = params, signup_problem = True)
