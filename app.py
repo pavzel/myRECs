@@ -16,7 +16,6 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 mongodb = PyMongo(app)
 
 params = {  "username": '',
-            "login_problem": False,
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
@@ -56,7 +55,6 @@ def get_all_places():
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
     global params
-    params['login_problem'] = False
     params["nav_active_curr"] = params["nav_active_main"]
     params["best_place_images"] = find_photo_url(2)
     number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
@@ -150,11 +148,11 @@ def get_selected_places():
     params["countries_to_display"] = request.form.getlist('country')
     return redirect(url_for('display_places', page_number=1))
 
-@app.route('/login')
-def login():
+@app.route('/login/<login_problem>')
+def login(login_problem):
     global params
     params["nav_active_curr"] = ["", "", "", "", "active", ""]
-    return render_template("login.html", params = params)
+    return render_template("login.html", params = params, login_problem = login_problem)
 
 @app.route('/sign_in', methods=["POST"])
 def sign_in():
@@ -166,16 +164,37 @@ def sign_in():
         user = users.find_one({"username": username})
         if user['password'] == password:
             params['username'] = username
-            params['login_problem'] = False
             return redirect(url_for('get_all_places'))
-    params['login_problem'] = True
-    return render_template("login.html", params = params)
+    return render_template("login.html", params = params, login_problem = True)
 
 @app.route('/logout')
 def logout():
     global params
     params['username'] = ''
     return redirect(url_for('get_all_places'))
+
+@app.route('/sign_up/<signup_problem>')
+def sign_up(signup_problem):
+    global params
+    params["nav_active_curr"] = ["", "", "", "", "", ""]
+    return render_template("signup.html", params = params, signup_problem = signup_problem)
+
+@app.route('/add_user')
+def add_user():
+    print("User is added!")
+    return render_template("login.html", params = params, login_problem = False)
+
+@app.route('/insert_user', methods=["POST"])
+def insert_user():
+    global params
+    users = mongodb.db.users
+    username = request.form.get('username')
+    password = request.form.get('password')
+    if users.count_documents({"username": username}) == 0:
+        users.insert_one({'username': username, 'password': password})
+        return redirect(url_for('login', login_problem = False))
+    return render_template("signup.html", params = params, signup_problem = True)
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
