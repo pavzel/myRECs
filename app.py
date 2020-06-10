@@ -15,14 +15,16 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 
 mongodb = PyMongo(app)
 
-params = {  "countries_to_display": [],
-                "nav_active_main": ["active", "", "", "", "", ""],
-                "nav_active_curr": ["active", "", "", "", "", ""],
-                "best_place_images": [],
-                "title_to_display": "All places",
-                "per_page": 15,
-                "max_page": 1,
-                "curr_page": 1}
+params = {  "username": '',
+            "login_problem": False,
+            "countries_to_display": [],
+            "nav_active_main": ["active", "", "", "", "", ""],
+            "nav_active_curr": ["active", "", "", "", "", ""],
+            "best_place_images": [],
+            "title_to_display": "All places",
+            "per_page": 15,
+            "max_page": 1,
+            "curr_page": 1}
 
 def find_photo_url(value):
     best_places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": value } })
@@ -150,26 +152,40 @@ def get_selected_places():
 @app.route('/login')
 def login():
     global params
-    number_of_matches = mongodb.db.users.count_documents({"user_name": "vsc731109"})
+    params["nav_active_curr"] = ["", "", "", "", "active", ""]
+    return render_template("login.html", params = params)
+
+@app.route('/sign_in', methods=["POST"])
+def sign_in():
+    global params
+    users = mongodb.db.users
+    username = request.form.get('username')
+    if users.count_documents({"username": username}) == 1:
+        params['username'] = username
+        params['login_problem'] = False
+        return redirect(url_for('get_all_places'))
+    else:
+        params['login_problem'] = True
+        return render_template("login.html", params = params)
+    """
+    number_of_matches = mongodb.db.users.count_documents({"username": "vsc731109"})
     if number_of_matches == 1:
-        for item in mongodb.db.users.find({"user_name": "vsc731109"}):
-            user = item
-            print("User:", user)
+        user = mongodb.db.users.find_one({"username": "user1"})
+        print("UserID:", user['_id'])
     else:
         print('Number of matches:', number_of_matches)
-    
-    user_id = user['_id']
-    user_name = user['user_name']
-    print(user_id)
-    print(user_name)
-
     users = mongodb.db.users
     users.insert_one({
         'username': user_name,
         'password': 'pass1'
     })
+    """
 
-    return render_template("login.html", params = params)
+@app.route('/logout')
+def logout():
+    global params
+    params['username'] = ''
+    return redirect(url_for('get_all_places'))
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),

@@ -3,8 +3,49 @@
 {% block content %}
 <br>
 <div class="container my-5">
-    <h1>Login Page:</h1>
 
+    <div class="row justify-content-center my-5">
+        <div class="col-lg-5">
+            <div class="row">
+                <h1 class="col ml-2">Login</h1>
+            </div>
+
+            {% if params.login_problem %}
+                <div class="alert alert-danger mx-3 mt-2" role="alert">
+                    Incorrect username or password entered. Please try again.
+                </div>
+            {% endif %}
+
+            <form action="{{ url_for('sign_in') }}" method="POST" class="col">
+                <div class="row justify-content-start">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="username"><strong>username: </strong></label>
+                            <input id="username" type="text" name="username" class="form-control" placeholder="Enter your username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password"><strong>password: </strong></label>
+                            <input id="password" type="text" name="password" class="form-control" placeholder="Enter your password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-1 justify-content-start">
+                    <button class="btn btn-primary ml-3" type="submit" name="action">Login</button>
+                    <a class="btn btn-primary ml-2" href="{{ url_for('display_places', page_number=params['curr_page']) }}">Cancel</a>
+                </div>
+            </form>
+
+            <div class="row mb-1 mt-5 justify-content-start">
+                <div class="col ml-3">
+                    <p>Don't have a username?</p>
+                    <a class="btn btn-success" href="">Sign Up</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <!--

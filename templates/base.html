@@ -32,13 +32,17 @@
                 <a class="nav-link" href="{{ url_for('search') }}">Search</a>
             </li>
             <li class="nav-item {{ params.nav_active_curr[3] }}">
-                <a class="nav-link" href="#">Recommendations</a>
+                <a class="nav-link" href="">Recommendations</a>
             </li>
             <li class="nav-item {{ params.nav_active_curr[4] }}">
-                <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                {% if params.username == '' %}
+                    <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout, <em>{{ params.username }}</em></a>
+                {% endif %}
             </li>
             <li class="nav-item {{ params.nav_active_curr[5] }}">
-                <a class="nav-link" href="#">Help</a>
+                <a class="nav-link" href="">Help</a>
             </li>
             </ul>
         </div>
