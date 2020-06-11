@@ -8,13 +8,6 @@ if os.path.exists("env.py"):
     import env
 
 
-app = Flask(__name__)
-
-app.config["MONGO_DBNAME"] = 'myRecsDB'
-app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
-
-mongodb = PyMongo(app)
-
 params = {  "username": '',
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
@@ -25,6 +18,14 @@ params = {  "username": '',
             "max_page": 1,
             "curr_page": 1}
 
+app = Flask(__name__)
+
+app.config["MONGO_DBNAME"] = 'myRecsDB'
+app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
+
+mongodb = PyMongo(app)
+
+
 def find_photo_url(value):
     best_places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": value } })
     best_place_images = []
@@ -34,11 +35,13 @@ def find_photo_url(value):
     random.shuffle(best_place_images)
     return best_place_images
 
+
 def update_countries(country):
     is_in_db = mongodb.db.countries.count_documents({"country_name": country})
     if is_in_db == 0:
         countries = mongodb.db.countries
         countries.insert_one({ 'country_name': country })
+
 
 @app.route('/')
 def get_all_places():
@@ -51,6 +54,7 @@ def get_all_places():
     for country in countries:
         params["countries_to_display"].append(country["country_name"])
     return redirect(url_for('display_places', page_number=1))
+
 
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
@@ -66,9 +70,11 @@ def display_places(page_number):
     """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
     return render_template('places.html', places = places, params = params)
 
+
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     global params
+    print('Logged in user:', params['username'])
     place_cursor = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     place = place_cursor
     place_dict = {}
@@ -78,9 +84,13 @@ def place_details(place_id):
     place_dict2['i_spoke'] = False
     place_dict2['place_name'] = place_dict['place_name']
     place_dict2['country'] = place_dict['country']
-    #if place_dict['added_by'] == params['username']:
-    #    print('Logged in user spoke')
-    #    place_dict2['my_opinion'] = place_dict['users'][params['username']]['my_opinion']
+    print('Added by:', place_dict['added_by'])
+    print('Logged in user:', params['username'])
+    if place_dict['added_by'] == params['username']:
+        print('Logged in user spoke')   
+        print("Loggedin user's opinion:", place_dict['users'][params['username']]['my_opinion'])
+        place_dict2['my_opinion'] = int(place_dict['users'][params['username']]['my_opinion'])
+        place_dict2['is_visited'] = place_dict['users'][params['username']]['is_visited']
     place_dict2['opinion'] = 0
     place_dict2['opinions'] = []
     place_dict2['photo_urls'] = []
@@ -105,12 +115,14 @@ def place_details(place_id):
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     return render_template('placedetails.html', place = place_dict2, params = params)
 
+
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     global params
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     return render_template('editplacedetails.html', place = place, params = params)
+
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
@@ -139,6 +151,7 @@ def add_place():
     params["nav_active_curr"] = ["", "active", "", "", "", ""]
     return render_template("addplace.html", params = params)
 
+
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
     places = mongodb.db.myRecPlaces
@@ -159,10 +172,12 @@ def insert_place():
     })
     return redirect(url_for('get_all_places'))
 
+
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
     mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
     return redirect(url_for('display_places', page_number=params["curr_page"]))
+
 
 @app.route('/search')
 def search():
@@ -170,6 +185,7 @@ def search():
     params["nav_active_curr"] = ["", "", "active", "", "", ""]
     countries = mongodb.db.countries.find().sort("country_name")
     return render_template("search.html", params = params, countries = countries)
+
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
@@ -180,11 +196,13 @@ def get_selected_places():
     params["countries_to_display"] = request.form.getlist('country')
     return redirect(url_for('display_places', page_number=1))
 
+
 @app.route('/login/<login_problem>')
 def login(login_problem):
     global params
     params["nav_active_curr"] = ["", "", "", "", "active", ""]
     return render_template("login.html", params = params, login_problem = login_problem)
+
 
 @app.route('/sign_in', methods=["POST"])
 def sign_in():
@@ -199,11 +217,13 @@ def sign_in():
             return redirect(url_for('get_all_places'))
     return render_template("login.html", params = params, login_problem = True)
 
+
 @app.route('/logout')
 def logout():
     global params
     params['username'] = ''
     return redirect(url_for('get_all_places'))
+
 
 @app.route('/sign_up/<signup_problem>')
 def sign_up(signup_problem):
@@ -211,10 +231,12 @@ def sign_up(signup_problem):
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     return render_template("signup.html", params = params, signup_problem = signup_problem)
 
+
 @app.route('/add_user')
 def add_user():
     print("User is added!")
     return render_template("login.html", params = params, login_problem = False)
+
 
 @app.route('/insert_user', methods=["POST"])
 def insert_user():

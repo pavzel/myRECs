@@ -15,8 +15,7 @@
             </div>
 
             <div class="col-lg-3">
-                <h1 class="font-weight-light">{{ place.place_name }}</h1>
-
+                <h1 class="font-weight-light mb-3">{{ place.place_name }}</h1>
                 {% if place.my_opinion %}
                     <p>
                         <strong>my opinion: </strong>
@@ -37,36 +36,41 @@
                         {% endif %}
                     </p>
                 {% endif %}
-<!--
                 {% if place.country %}
                     <p><strong>country: </strong>{{ place.country }}</p>
                 {% endif %}
+                {% if place.i_spoke == True %}
                 {% if place.is_visited %}
                     <p><strong>visited: </strong>Yes</p>
                 {% else %}
                     <p><strong>visited: </strong>Not yet</p>
                 {% endif %}
-                {% if place.website %}
-                    <p><strong>website: </strong><a href="{{ place.website }}" target="_blank">{{ place.place_name }} (link)</a></p>
+                {% endif %}
+                {% if place.websites != [] %}
+                    <p class="mb-0"><strong>websites: </strong></p>
+                    <ul>
+                        {% for website in place.websites %}
+                            <li><a href="{{ website }}" target="_blank">{{ place.place_name }} (link {{ loop.index }})</a></li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
                 <div class="row justify-content-start">
                     <a class="btn btn-primary btn ml-3" href="{{ url_for('display_places', page_number=params['curr_page']) }}" role="button">Back</a>
                     <a class="btn btn-primary btn ml-2" href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
                 </div>
+            </div>
+        </div>
 
-            </div>
--->
-        </div>
-<!--
-        <div class="row align-items-center my-5">
-            <div class="col">
-                {% if place.comment %}
+        {% if place.comments != [] %}
+            <div class="row align-items-center my-5">
+                <div class="col">
                     <p><strong>comments: </strong></p>
-                    <p>{{ place.comment }}</p>
-                {% endif %}
+                    {% for comment in place.comments %}
+                        <p>{{ comment }}</p>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
--->
+        {% endif %}
     </div>
 
     <br>
