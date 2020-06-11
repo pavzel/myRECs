@@ -67,8 +67,8 @@ def display_places(page_number):
     index_min = params["per_page"] * (params["curr_page"] - 1)
     index_max = params["per_page"] * params["curr_page"]
     places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("my_opinion", -1)[index_min:index_max]
-    """places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": 2} })"""
     return render_template('places.html', places = places, params = params)
+
 
 
 @app.route('/place_details/<place_id>')
@@ -81,14 +81,9 @@ def place_details(place_id):
     for key in place:
         place_dict[key] = place[key]
     place_dict2 = {}
-    place_dict2['i_spoke'] = False
     place_dict2['place_name'] = place_dict['place_name']
     place_dict2['country'] = place_dict['country']
-    print('Added by:', place_dict['added_by'])
-    print('Logged in user:', params['username'])
-    if place_dict['added_by'] == params['username']:
-        print('Logged in user spoke')   
-        print("Loggedin user's opinion:", place_dict['users'][params['username']]['my_opinion'])
+    if params['username'] != '':
         place_dict2['my_opinion'] = int(place_dict['users'][params['username']]['my_opinion'])
         place_dict2['is_visited'] = place_dict['users'][params['username']]['is_visited']
     place_dict2['opinion'] = 0
@@ -100,11 +95,12 @@ def place_details(place_id):
     for user in users:
         place_dict2['opinion'] += int(users[user]['my_opinion'])
         place_dict2['opinions'].append(int(users[user]['my_opinion']))
-        place_dict2['photo_urls'].append(users[user]['photo_url'])
-        place_dict2['websites'].append(users[user]['website'])
-        place_dict2['comments'].append(users[user]['comment'])
-        if user == params['username']:
-            place_dict2['i_spoke'] = True
+        if users[user]['photo_url'] != '':
+            place_dict2['photo_urls'].append(users[user]['photo_url'])
+        if users[user]['website'] != '':
+            place_dict2['websites'].append(users[user]['website'])
+        if users[user]['comment'] != '':
+            place_dict2['comments'].append(users[user]['comment'])
     place_dict2['opinion'] /= len(place_dict2['opinions'])
     if place_dict2['opinion'] > 0:
         place_dict2['opinion_str'] = '+' + str(round(place_dict2['opinion'], 2))

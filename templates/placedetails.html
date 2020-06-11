@@ -4,17 +4,42 @@
     <br>
 
     <div class="container">
-        <div class="row align-items-center my-5">
-
+        <div class="row align-items-start mt-5">
             <div class="col-lg-9">
-                {% if place.photo_urls[0] %}
-                    <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.photo_urls[0] }}">
-                {% else %}
-                    <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400">
-                {% endif %}
+                <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {% for photo in place.photo_urls %}
+                            {% if loop.index == 1 %}
+                                <li data-target="#carouselExampleIndicators" data-slide-to="{{ loop.index }}" class="active"></li>
+                            {% else %}
+                                <li data-target="#carouselExampleIndicators" data-slide-to="{{ loop.index }}"></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+                    <div class="carousel-inner" role="listbox">
+                        {% for photo in place.photo_urls %}
+                            {% if loop.index == 1 %}
+                                <div class="carousel-item active" data-interval="10000">
+                                    <img class="d-block img-fluid w-100" src="{{ photo }}" alt="">
+                                </div>
+                            {% else %}
+                                <div class="carousel-item" data-interval="10000">
+                                    <img class="d-block img-fluid w-100" src="{{ photo }}" alt="">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
             </div>
-
-            <div class="col-lg-3">
+            <div class="col-lg-3 mt-3">
                 <h1 class="font-weight-light mb-3">{{ place.place_name }}</h1>
                 {% if place.my_opinion %}
                     <p>
@@ -36,15 +61,39 @@
                         {% endif %}
                     </p>
                 {% endif %}
+                <p>
+                    <strong>users' opinion: </strong>
+                    {% if place.opinion_int > 0 %}
+                        {{ place.opinion_str }}
+                        {% for i in range(place.opinion_int) %}
+                            <i class="fa fa-thumbs-up"></i>
+                        {% endfor %}
+                    {% endif %}
+                    {% if place.opinion_int < 0 %}
+                        {{ place.opinion_str }}
+                        {% for i in range(-place.opinion_int) %}
+                            <i class="fa fa-thumbs-down"></i>
+                        {% endfor %}
+                    {% endif %}
+                    {% if place.opinion_int == 0 %}
+                        {{ place.opinion_str }}
+                    {% endif %}
+                </p>
                 {% if place.country %}
-                    <p><strong>country: </strong>{{ place.country }}</p>
+                    <p>
+                        <strong>country: </strong>
+                        {{ place.country }}
+                    </p>
                 {% endif %}
-                {% if place.i_spoke == True %}
-                {% if place.is_visited %}
-                    <p><strong>visited: </strong>Yes</p>
-                {% else %}
-                    <p><strong>visited: </strong>Not yet</p>
-                {% endif %}
+                {% if params.username != '' %}
+                    <p>
+                        <strong>visited: </strong>
+                        {% if place.is_visited %}
+                            Yes
+                        {% else %}
+                            Not yet
+                        {% endif %}
+                    </p>
                 {% endif %}
                 {% if place.websites != [] %}
                     <p class="mb-0"><strong>websites: </strong></p>
@@ -62,7 +111,7 @@
         </div>
 
         {% if place.comments != [] %}
-            <div class="row align-items-center my-5">
+            <div class="row align-items-center my-1">
                 <div class="col">
                     <p><strong>comments: </strong></p>
                     {% for comment in place.comments %}
