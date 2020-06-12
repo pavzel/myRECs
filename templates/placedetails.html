@@ -41,7 +41,7 @@
             </div>
             <div class="col-lg-3 mt-3">
                 <h1 class="font-weight-light mb-3">{{ place.place_name }}</h1>
-                {% if place.my_opinion %}
+                {% if place.status == 'contributor' %}
                     <p>
                         <strong>my opinion: </strong>
                         {% if place.my_opinion > 0 %}
@@ -85,7 +85,7 @@
                         {{ place.country }}
                     </p>
                 {% endif %}
-                {% if params.username != '' %}
+                {% if place.status == 'contributor' %}
                     <p>
                         <strong>visited: </strong>
                         {% if place.is_visited %}
@@ -105,7 +105,11 @@
                 {% endif %}
                 <div class="row justify-content-start">
                     <a class="btn btn-primary btn ml-3" href="{{ url_for('display_places', page_number=params['curr_page']) }}" role="button">Back</a>
-                    <a class="btn btn-primary btn ml-2" href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
+                    {% if place.status == 'anonymous' %}
+                        <a class="btn btn-primary btn ml-2" href="{{ url_for('login', login_problem = False) }}" role="button">Edit</a>
+                    {% else %}
+                        <a class="btn btn-primary btn ml-2" href="{{ url_for('edit_place_details', place_id=place._id) }}" role="button">Edit</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

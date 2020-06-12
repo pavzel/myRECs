@@ -30,7 +30,7 @@ def see():
             if 'is_visited' in place.keys():
                 new_object['is_visited'] = bool(place['is_visited'])
             else:
-                new_object['my_opinion'] = bool(False)
+                new_object['is_visited'] = bool(False)
             if 'photo_url' in place.keys():
                 new_object['photo_url'] = place['photo_url']
             else:

@@ -70,20 +70,26 @@ def display_places(page_number):
     return render_template('places.html', places = places, params = params)
 
 
-
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     global params
     print('Logged in user:', params['username'])
-    place_cursor = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    place = place_cursor
+    place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     place_dict = {}
     for key in place:
         place_dict[key] = place[key]
     place_dict2 = {}
+    place_dict2['_id'] = place_dict['_id']
+    if params['username'] == '':
+        place_dict2['status'] = 'anonymous'
+    else:
+        if params['username'] in place['users'].keys():
+            place_dict2['status'] = 'contributor'
+        else:
+            place_dict2['status'] = 'visitor'
     place_dict2['place_name'] = place_dict['place_name']
     place_dict2['country'] = place_dict['country']
-    if params['username'] != '':
+    if place_dict2['status'] == 'contributor':
         place_dict2['my_opinion'] = int(place_dict['users'][params['username']]['my_opinion'])
         place_dict2['is_visited'] = place_dict['users'][params['username']]['is_visited']
     place_dict2['opinion'] = 0
@@ -117,28 +123,42 @@ def edit_place_details(place_id):
     global params
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     params["nav_active_curr"] = ["", "", "", "", "", ""]
-    return render_template('editplacedetails.html', place = place, params = params)
+    editor = params['username']
+    if not (editor in place['users'].keys()):
+        users = place['users']
+        new_user = {}
+        new_user['my_opinion'] = int(0)
+        new_user['is_visited'] = bool(False)
+        new_user['photo_url'] = ''
+        new_user['website'] = ''
+        new_user['comment'] = ''
+        places = mongodb.db.myRecPlaces
+        users[editor] = new_user
+        places.update_one({"_id": ObjectId(place_id)}, { "$set": { 'users': users } })
+    return render_template('editplacedetails.html', place = place, params = params, editor = editor)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
     global params
+    editor = params['username']
     places = mongodb.db.myRecPlaces
+    place = places.find_one({"_id": ObjectId(place_id)})
+    place_modified = {}
+    place_modified['place_name'] = request.form.get('place_name')
     country = request.form.get('country')
     if country == '':
         country = 'not sure'
     update_countries(country)
-    my_opinion = int(request.form.get('my_opinion'))
-    is_visited = bool(request.form.get('is_visited'))
-    places.update_one({"_id": ObjectId(place_id)}, { "$set": {
-        'place_name': request.form.get('place_name'),
-        'country': country,
-        'my_opinion': my_opinion,
-        'is_visited': is_visited,
-        'website': request.form.get('website'),
-        'photo_url': request.form.get('photo_url'),
-        'comment': request.form.get('comment') }
-    })
+    place_modified['country'] = country
+    places.update_one({"_id": ObjectId(place_id)}, {"$set": place_modified})
+    users = place['users']
+    users[editor]['my_opinion'] = int(request.form.get('my_opinion'))
+    users[editor]['is_visited'] = bool(request.form.get('is_visited'))
+    users[editor]['photo_url'] = request.form.get('photo_url')
+    users[editor]['website'] = request.form.get('website')
+    users[editor]['comment'] = request.form.get('comment')
+    places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
 @app.route('/add_place')
@@ -226,12 +246,6 @@ def sign_up(signup_problem):
     global params
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     return render_template("signup.html", params = params, signup_problem = signup_problem)
-
-
-@app.route('/add_user')
-def add_user():
-    print("User is added!")
-    return render_template("login.html", params = params, login_problem = False)
 
 
 @app.route('/insert_user', methods=["POST"])

@@ -21,7 +21,7 @@
                             {% if editor == place.added_by %}
                                 <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}">
                             {% else %}
-                                <input id="place_name" type="text" name="place_name" class="font-weight-light col-12" value="{{ place.place_name }}" readonly>
+                                <input id="place_name" type="text" name="place_name" class="font-weight-light col-12" value="{{ place.place_name }}" disabled>
                             {% endif %}
                         </h1>
                     </div>
@@ -34,7 +34,7 @@
                         {% if editor == place.added_by %}
                             <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}">
                         {% else %}
-                            <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" readonly>
+                            <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" disabled>
                         {% endif %}
                     </div>
                     <div class="row mb-3 justify-content-between">
