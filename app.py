@@ -125,17 +125,17 @@ def edit_place_details(place_id):
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     editor = params['username']
     if not (editor in place['users'].keys()):
-        users = place['users']
         new_user = {}
         new_user['my_opinion'] = int(0)
         new_user['is_visited'] = bool(False)
         new_user['photo_url'] = ''
         new_user['website'] = ''
         new_user['comment'] = ''
-        places = mongodb.db.myRecPlaces
+        users = place['users']
         users[editor] = new_user
-        places.update_one({"_id": ObjectId(place_id)}, { "$set": { 'users': users } })
-    return render_template('editplacedetails.html', place = place, params = params, editor = editor)
+        places = mongodb.db.myRecPlaces
+        places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+    return render_template('editplacedetails.html', place=place, params=params, editor=editor)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
@@ -191,7 +191,15 @@ def insert_place():
 
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
-    mongodb.db.myRecPlaces.remove({'_id': ObjectId(place_id)})
+    global params
+    places = mongodb.db.myRecPlaces
+    place = places.find_one({"_id": ObjectId(place_id)})
+    if params['username'] == place['added_by']:
+        places.remove({'_id': ObjectId(place_id)})
+    else:
+        users = place['users']
+        users.pop(params['username'])
+        places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
 
