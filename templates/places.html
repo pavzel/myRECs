@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
                 <ol class="carousel-indicators">
                     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
@@ -13,13 +12,13 @@
                 </ol>
                 <div class="carousel-inner" role="listbox">
                     <div class="carousel-item active">
-                    <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[0] }}" alt="">
+                        <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[0] }}">
                     </div>
                     <div class="carousel-item">
-                    <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[1] }}" alt="">
+                        <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[1] }}">
                     </div>
                     <div class="carousel-item">
-                    <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[2] }}" alt="">
+                        <img class="d-block img-fluid img-fitted" src="{{ params.best_place_images[2] }}">
                     </div>
                 </div>
                 <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
@@ -30,99 +29,104 @@
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
-                </div>
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col">
-                <h1>{{ params.title_to_display }}:</h1>
-            </div>
+    <div class="row">
+        <div class="col">
+            <h1>{{ params.title_to_display }}:</h1>
         </div>
+    </div>
 
-        <div class="row mb-3">
-
-            <div class="card-columns">
-                {% for place in places %}
-                    <div class="col mb-3">
-                        <div class="card shadow-sm">
-                            <a href="#">
-                                {% if place.photo_url %}
-                                    <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid" alt="">
-                                {% else %}
-                                    <img class="card-img-top" src="http://placehold.it/700x400" alt="">
-                                {% endif %}
-                            </a>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <h5 class="card-title">
-                                            <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
-                                        </h5>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="row justify-content-end">
-                                            <a class="btn btn-primary btn-sm mr-2"
-                                                href="{{ url_for('place_details', place_id=place._id) }}" role="button">Details</a>
-                                        </div>
+    <div class="row mb-3">
+        <div class="card-columns">
+            {% for place in places %}
+                <div class="col mb-3">
+                    <div class="card shadow-sm">
+                        <a href="#">
+                            {% if place.photo_url %}
+                                <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid">
+                            {% else %}
+                                <img class="card-img-top" src="http://placehold.it/700x400">
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-8">
+                                    <h5 class="card-title">
+                                        <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
+                                    </h5>
+                                </div>
+                                <div class="col-4">
+                                    <div class="row justify-content-end">
+                                        <a class="btn btn-primary btn-sm mr-2"
+                                            href="{{ url_for('place_details', place_id=place._id) }}" role="button">
+                                            Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-footer">
-                                {% for key, value in place.items() %}
-                                    {% if key == 'my_opinion' %}
-                                        <p class="text-danger">
-                                            My opinion: 
-                                            {% if place.my_opinion > 0 %}
-                                                +{{ place.my_opinion }}
-                                                {% for i in range(place.my_opinion) %}
-                                                    <i class="fa fa-thumbs-up"></i>
-                                                {% endfor %}
-                                            {% endif %}
-                                            {% if place.my_opinion < 0 %}
-                                                {{ place.my_opinion }}
-                                                {% for i in range(-place.my_opinion) %}
-                                                    <i class="fa fa-thumbs-down"></i>
-                                                {% endfor %}
-                                            {% endif %}
-                                            {% if place.my_opinion == 0 %}
-                                                {{ place.my_opinion }}
-                                            {% endif %}
-                                        </p>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
+                        </div>
+                        <div class="card-footer">
+                            {% for key, value in place.items() %}
+                                {% if key == 'my_opinion' %}
+                                    <p class="text-danger">
+                                        My opinion: 
+                                        {% if place.my_opinion > 0 %}
+                                            +{{ place.my_opinion }}
+                                            {% for i in range(place.my_opinion) %}
+                                                <i class="fa fa-thumbs-up"></i>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if place.my_opinion < 0 %}
+                                            {{ place.my_opinion }}
+                                            {% for i in range(-place.my_opinion) %}
+                                                <i class="fa fa-thumbs-down"></i>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if place.my_opinion == 0 %}
+                                            {{ place.my_opinion }}
+                                        {% endif %}
+                                    </p>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-
+                </div>
+            {% endfor %}
         </div>
-        <br>
     </div>
+    <br>
+</div>
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination pagination-sm justify-content-center pb-5">
-            {% if (params.curr_page > 1) %}
-                <li class="page-item"><a class="page-link" href="{{ url_for('display_places', page_number=1) }}">First</a></li>
-                <li class="page-item"><a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page-1) }}">Previous</a></li>
-            {% else %}
-                <li class="page-item disabled"><a class="page-link" href="">First</a></li>
-                <li class="page-item disabled"><a class="page-link" href="">Previous</a></li>
-            {% endif %}
-            <li class="page-item disabled"><a class="page-link text-white bg-primary" href="">Page {{ params.curr_page }}</a></li>
-            {% if (params.curr_page < params.max_page) %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page+1) }}">Next</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('display_places', page_number=params.max_page) }}">Last ({{ params.max_page }})</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><a class="page-link" href="">Next</a></li>
-                <li class="page-item disabled"><a class="page-link" href="">Last ({{ params.max_page }})</a></li>
-            {% endif %}
-        </ul>
-    </nav>
-
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-sm justify-content-center pb-5">
+        {% if (params.curr_page > 1) %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('display_places', page_number=1) }}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page-1) }}">Previous</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link" href="">First</a></li>
+            <li class="page-item disabled"><a class="page-link" href="">Previous</a></li>
+        {% endif %}
+        <li class="page-item disabled">
+            <a class="page-link text-white bg-primary" href="">Page {{ params.curr_page }}</a>
+        </li>
+        {% if (params.curr_page < params.max_page) %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('display_places', page_number=params.curr_page+1) }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('display_places', page_number=params.max_page) }}">Last ({{ params.max_page }})</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><a class="page-link" href="">Next</a></li>
+            <li class="page-item disabled"><a class="page-link" href="">Last ({{ params.max_page }})</a></li>
+        {% endif %}
+    </ul>
+</nav>
 {% endblock %}

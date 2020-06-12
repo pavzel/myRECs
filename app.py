@@ -27,7 +27,7 @@ mongodb = PyMongo(app)
 
 
 def find_photo_url(value):
-    best_places = mongodb.db.myRecPlaces.find({"my_opinion": { "$gte": value } })
+    best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } })
     best_place_images = []
     for place in best_places:
         if 'photo_url' in place.keys():
@@ -41,6 +41,21 @@ def update_countries(country):
     if is_in_db == 0:
         countries = mongodb.db.countries
         countries.insert_one({ 'country_name': country })
+
+
+def get_users_opinion(users):
+    users_opinion = 0
+    users_opinions = []
+    for user in users:
+        users_opinion += int(users[user]['my_opinion'])
+        users_opinions.append(int(users[user]['my_opinion']))
+    users_opinion /= len(users_opinions)
+    if users_opinion > 0:
+        opinion_str = '+' + str(round(users_opinion, 2))
+    else:
+        opinion_str = str(round(users_opinion, 2))
+    opinion_int = int(round(users_opinion))
+    return opinion_str, opinion_int
 
 
 @app.route('/')
@@ -66,7 +81,15 @@ def display_places(page_number):
     params["curr_page"] = int(page_number)
     index_min = params["per_page"] * (params["curr_page"] - 1)
     index_max = params["per_page"] * params["curr_page"]
-    places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("my_opinion", -1)[index_min:index_max]
+    places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("opinion", -1)[index_min:index_max]
+    """
+    places_dict = {}
+    for place in places:
+        place_name = place['place_name']
+        #photo_url 
+        #place_dict[key] = places[key]
+        #place_dict2 = {}
+    """
     return render_template('places.html', places = places, params = params)
 
 
@@ -92,27 +115,18 @@ def place_details(place_id):
     if place_dict2['status'] == 'contributor':
         place_dict2['my_opinion'] = int(place_dict['users'][params['username']]['my_opinion'])
         place_dict2['is_visited'] = place_dict['users'][params['username']]['is_visited']
-    place_dict2['opinion'] = 0
-    place_dict2['opinions'] = []
     place_dict2['photo_urls'] = []
     place_dict2['websites'] = []
     place_dict2['comments'] = []
     users = place_dict['users']
     for user in users:
-        place_dict2['opinion'] += int(users[user]['my_opinion'])
-        place_dict2['opinions'].append(int(users[user]['my_opinion']))
         if users[user]['photo_url'] != '':
             place_dict2['photo_urls'].append(users[user]['photo_url'])
         if users[user]['website'] != '':
             place_dict2['websites'].append(users[user]['website'])
         if users[user]['comment'] != '':
             place_dict2['comments'].append(users[user]['comment'])
-    place_dict2['opinion'] /= len(place_dict2['opinions'])
-    if place_dict2['opinion'] > 0:
-        place_dict2['opinion_str'] = '+' + str(round(place_dict2['opinion'], 2))
-    else:
-        place_dict2['opinion_str'] = str(round(place_dict2['opinion'], 2))
-    place_dict2['opinion_int'] = int(round(place_dict2['opinion']))
+    place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
     print('Place dict2:', place_dict2)
     params["nav_active_curr"] = ["", "", "", "", "", ""]
     return render_template('placedetails.html', place = place_dict2, params = params)

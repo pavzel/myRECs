@@ -1,102 +1,93 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <br>
-
-    <div class="container">
-
-        <form action="{{ url_for('update_place', place_id=place._id) }}" method="POST" class="col">
-
-            <div class="row align-items-center mt-5 mb-2">
-                <div class="col-lg-9">
-                    {% if place.users[editor].photo_url %}
-                        <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.users[editor].photo_url }}" alt="">
-                    {% else %}
-                        <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400" alt="">
-                    {% endif %}
-                </div>
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <h1 class="input-field">
-                            {% if editor == place.added_by %}
-                                <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}">
-                            {% else %}
-                                <input id="place_name" type="text" name="place_name" class="font-weight-light col-12" value="{{ place.place_name }}" readonly>
-                            {% endif %}
-                        </h1>
-                    </div>
-                    <div class="form-group">
-                        <label for="my_opinion"><strong>my opinion: </strong><span id="current_opinion">{{ place.users[editor].my_opinion }}</span></label>
-                        <input id="my_opinion" type="range" name="my_opinion" class="custom-range" min="-3" max="3" value="{{ place.users[editor].my_opinion }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="country"><strong>country: </strong></label>
-                        {% if editor == place.added_by %}
-                            <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}">
-                        {% else %}
-                            <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" readonly>
-                        {% endif %}
-                    </div>
-                    <div class="row mb-3 justify-content-between">
-                        <span class="ml-3"><strong>visited: </strong></span>
-                        <span class="ml-2 mr-2">Not yet</span>
-                        <div class="custom-control custom-switch mr-auto">
-                            {% if place.users[editor].is_visited %}
-                                <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited" checked>
-                            {% else %}
-                                <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited">
-                            {% endif %}
-                            <label class="custom-control-label" for="is_visited">Yes</label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="website"><strong>website: </strong></label>
-                        {% if place.users[editor].website %}
-                            <input id="website" type="text" name="website" class="validate form-control" value="{{ place.users[editor].website }}">
-                        {% else %}
-                            <input id="website" type="text" name="website" class="validate form-control" placeholder="Add website URL">
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label for="photo_url"><strong>photo URL: </strong></label>
-                        {% if place.users[editor].photo_url %}
-                            <input id="photo_url" type="text" name="photo_url" class="validate form-control" value="{{ place.users[editor].photo_url }}">
-                        {% else %}
-                            <input id="photo_url" type="text" name="photo_url" class="validate form-control" placeholder="Add link to a photo">
-                        {% endif %}
-                    </div>
-                    <div class="row mb-1 justify-content-start">
-                        <button class="btn btn-primary ml-3" type="submit" name="action">Update</button>
-                        <a class="btn btn-primary ml-2" href="{{ url_for('display_places', page_number=params['curr_page']) }}">Cancel</a>
-                    </div>
-                    <div class="row mb-1 justify-content-start">
-                        <a class="btn btn-danger ml-3" href="{{ url_for('delete_place', place_id=place._id) }}">Delete this place<br>(no recover!!!)</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group row align-items-center ml-0 mt-2 mb-4">
-                <label for="comment"><strong>comment: </strong></label>
-                {% if place.users[editor].comment %}
-                    <textarea id="comment" name="comment" class="form-control" rows="15" value="{{ place.users[editor].comment }}">
-                        {{ place.users[editor].comment }}
-                    </textarea>
+<br>
+<div class="container">
+    <form action="{{ url_for('update_place', place_id=place._id) }}" method="POST" class="col">
+        <div class="row align-items-center mt-5 mb-2">
+            <div class="col-lg-9">
+                {% if place.users[editor].photo_url %}
+                    <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ place.users[editor].photo_url }}">
                 {% else %}
-                    <textarea id="comment" name="comment" class="form-control" rows="15" placeholder="Please, write your comments here."></textarea>
+                    <img class="img-fluid rounded mb-4 mb-lg-0" src="http://placehold.it/900x400">
                 {% endif %}
             </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <h1 class="input-field">
+                        {% if editor == place.added_by %}
+                            <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}">
+                        {% else %}
+                            <input id="place_name" type="text" name="place_name" class="font-weight-light col-12" value="{{ place.place_name }}" readonly>
+                        {% endif %}
+                    </h1>
+                </div>
+                <div class="form-group">
+                    <label for="my_opinion"><strong>my opinion: </strong><span id="current_opinion">{{ place.users[editor].my_opinion }}</span></label>
+                    <input id="my_opinion" type="range" name="my_opinion" class="custom-range" min="-3" max="3" value="{{ place.users[editor].my_opinion }}">
+                </div>
+                <div class="form-group">
+                    <label for="country"><strong>country: </strong></label>
+                    {% if editor == place.added_by %}
+                        <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}">
+                    {% else %}
+                        <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" readonly>
+                    {% endif %}
+                </div>
+                <div class="row mb-3 justify-content-between">
+                    <span class="ml-3"><strong>visited: </strong></span>
+                    <span class="ml-2 mr-2">Not yet</span>
+                    <div class="custom-control custom-switch mr-auto">
+                        {% if place.users[editor].is_visited %}
+                            <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited" checked>
+                        {% else %}
+                            <input type="checkbox" class="custom-control-input" id="is_visited" name="is_visited">
+                        {% endif %}
+                        <label class="custom-control-label" for="is_visited">Yes</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="website"><strong>website: </strong></label>
+                    {% if place.users[editor].website %}
+                        <input id="website" type="text" name="website" class="validate form-control" value="{{ place.users[editor].website }}">
+                    {% else %}
+                        <input id="website" type="text" name="website" class="validate form-control" placeholder="Add website URL">
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="photo_url"><strong>photo URL: </strong></label>
+                    {% if place.users[editor].photo_url %}
+                        <input id="photo_url" type="text" name="photo_url" class="validate form-control" value="{{ place.users[editor].photo_url }}">
+                    {% else %}
+                        <input id="photo_url" type="text" name="photo_url" class="validate form-control" placeholder="Add link to a photo">
+                    {% endif %}
+                </div>
+                <div class="row mb-1 justify-content-start">
+                    <button class="btn btn-primary ml-3" type="submit" name="action">Update</button>
+                    <a class="btn btn-primary ml-2" href="{{ url_for('display_places', page_number=params['curr_page']) }}">Cancel</a>
+                </div>
+                <div class="row mb-1 justify-content-start">
+                    <a class="btn btn-danger ml-3" href="{{ url_for('delete_place', place_id=place._id) }}">Delete this place<br>(no recover!!!)</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row align-items-center ml-0 mt-2 mb-4">
+            <label for="comment"><strong>comment: </strong></label>
+            {% if place.users[editor].comment %}
+                <textarea id="comment" name="comment" class="form-control" rows="15" value="{{ place.users[editor].comment }}">
+                    {{ place.users[editor].comment }}
+                </textarea>
+            {% else %}
+                <textarea id="comment" name="comment" class="form-control" rows="15" placeholder="Please, write your comments here."></textarea>
+            {% endif %}
+        </div>
+    </form>
+</div>
+<br>
 
-        </form>
-
-    </div>
-
-    <br>
-
-    <script>
-        const slider = document.getElementById("my_opinion");
-        const output = document.getElementById("current_opinion");
-
-        slider.oninput = function() {output.innerHTML = this.value;}
-    </script>
+<script>
+    const slider = document.getElementById("my_opinion");
+    const output = document.getElementById("current_opinion");
+    slider.oninput = function() {output.innerHTML = this.value;}
+</script>
 {% endblock %}
