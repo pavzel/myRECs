@@ -26,7 +26,11 @@
                 </a>
             </li>
             <li class="nav-item {{ params.nav_active_curr[1] }}">
-                <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
+                {% if params.username == '' %}
+                    <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Add place</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
+                {% endif %}
             </li>
             <li class="nav-item {{ params.nav_active_curr[2] }}">
                 <a class="nav-link" href="{{ url_for('search') }}">Search</a>

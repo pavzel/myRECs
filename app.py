@@ -170,6 +170,7 @@ def add_place():
 
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
+    global params
     places = mongodb.db.myRecPlaces
     country = request.form.get('country')
     if country == '':
@@ -180,11 +181,16 @@ def insert_place():
     places.insert_one({
         'place_name': request.form.get('place_name'),
         'country': country,
-        'my_opinion': my_opinion,
-        'is_visited': is_visited,
-        'website': request.form.get('website'),
-        'photo_url': request.form.get('photo_url'),
-        'comment': request.form.get('comment')
+        'added_by': params['username'],
+        'users': {
+            params['username']: {
+                'my_opinion': my_opinion,
+                'is_visited': is_visited,
+                'website': request.form.get('website'),
+                'photo_url': request.form.get('photo_url'),
+                'comment': request.form.get('comment')
+            }
+        }
     })
     return redirect(url_for('get_all_places'))
 
