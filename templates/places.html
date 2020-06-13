@@ -69,28 +69,20 @@
                             </div>
                         </div>
                         <div class="card-footer">
-                            {% for key, value in place.items() %}
-                                {% if key == 'my_opinion' %}
-                                    <p class="text-danger">
-                                        My opinion: 
-                                        {% if place.my_opinion > 0 %}
-                                            +{{ place.my_opinion }}
-                                            {% for i in range(place.my_opinion) %}
-                                                <i class="fa fa-thumbs-up"></i>
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if place.my_opinion < 0 %}
-                                            {{ place.my_opinion }}
-                                            {% for i in range(-place.my_opinion) %}
-                                                <i class="fa fa-thumbs-down"></i>
-                                            {% endfor %}
-                                        {% endif %}
-                                        {% if place.my_opinion == 0 %}
-                                            {{ place.my_opinion }}
-                                        {% endif %}
-                                    </p>
+                            <p class="text-danger">
+                                Users' opinion:
+                                {{ place.opinion_str }}
+                                {% if place.opinion_int > 0 %}
+                                    {% for i in range(place.opinion_int) %}
+                                        <i class="fa fa-thumbs-up"></i>
+                                    {% endfor %}
                                 {% endif %}
-                            {% endfor %}
+                                {% if place.opinion_int < 0 %}
+                                    {% for i in range(-place.opinion_int) %}
+                                        <i class="fa fa-thumbs-down"></i>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>

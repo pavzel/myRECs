@@ -58,6 +58,16 @@ def get_users_opinion(users):
     return opinion_str, opinion_int
 
 
+def get_random_photo(users):
+    users_photos = []
+    for user in users:
+        photo_url = users[user]['photo_url']
+        if photo_url != '':
+            users_photos.append(users[user]['photo_url'])
+    random.shuffle(users_photos)
+    return users_photos[0]
+
+
 @app.route('/')
 def get_all_places():
     global params
@@ -74,23 +84,29 @@ def get_all_places():
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
     global params
+    # Set display parameters
     params["nav_active_curr"] = params["nav_active_main"]
     params["best_place_images"] = find_photo_url(2)
+    # Select places to display
     number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
     params["max_page"] = math.ceil(number_of_places_to_display / params["per_page"])
     params["curr_page"] = int(page_number)
     index_min = params["per_page"] * (params["curr_page"] - 1)
     index_max = params["per_page"] * params["curr_page"]
     places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("opinion", -1)[index_min:index_max]
-    """
-    places_dict = {}
+    # For the selected places, prepare a list with essential data
+    places_list = []
     for place in places:
         place_name = place['place_name']
-        #photo_url 
-        #place_dict[key] = places[key]
-        #place_dict2 = {}
-    """
-    return render_template('places.html', places = places, params = params)
+        photo_url = get_random_photo(place['users'])
+        opinion_str, opinion_int = get_users_opinion(place['users'])
+        places_list.append({
+            'photo_url': photo_url,
+            'place_name': place_name,
+            'opinion_str': opinion_str,
+            'opinion_int': opinion_int
+        })
+    return render_template('places.html', places=places_list, params=params)
 
 
 @app.route('/place_details/<place_id>')
