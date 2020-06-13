@@ -8,7 +8,7 @@ if os.path.exists("env.py"):
     import env
 
 
-params = {  "username": '',
+params = {  "logged_in_user": '',
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
@@ -43,13 +43,18 @@ def update_countries(country):
         countries.insert_one({ 'country_name': country })
 
 
-def get_users_opinion(users):
+def calculate_users_opinion(users):
     users_opinion = 0
     users_opinions = []
     for user in users:
         users_opinion += int(users[user]['my_opinion'])
         users_opinions.append(int(users[user]['my_opinion']))
     users_opinion /= len(users_opinions)
+    return users_opinion
+
+
+def get_users_opinion(users):
+    users_opinion = calculate_users_opinion(users)
     if users_opinion > 0:
         opinion_str = '+' + str(round(users_opinion, 2))
     else:
@@ -71,22 +76,20 @@ def get_random_photo(users):
 @app.route('/')
 def get_all_places():
     global params
-    params["nav_active_main"] = ["active", "", "", "", "", ""]
-    params["title_to_display"] = "All places"
-    params["curr_page"] = 1
-    params["countries_to_display"].clear()
-    countries = mongodb.db.countries.find().sort("country_name")
+    # Set display parameters
+    params['nav_active_main'] = ["active", "", "", "", "", ""]
+    params['title_to_display'] = "All places"
+    params['curr_page'] = 1
+    params['countries_to_display'].clear()
+    countries = mongodb.db.countries.find().sort('country_name')
     for country in countries:
-        params["countries_to_display"].append(country["country_name"])
+        params['countries_to_display'].append(country['country_name'])
     return redirect(url_for('display_places', page_number=1))
 
 
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
     global params
-    # Set display parameters
-    params["nav_active_curr"] = params["nav_active_main"]
-    params["best_place_images"] = find_photo_url(2)
     # Select places to display
     number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
     params["max_page"] = math.ceil(number_of_places_to_display / params["per_page"])
@@ -101,36 +104,40 @@ def display_places(page_number):
         photo_url = get_random_photo(place['users'])
         opinion_str, opinion_int = get_users_opinion(place['users'])
         places_list.append({
+            '_id': place['_id'],
             'photo_url': photo_url,
             'place_name': place_name,
             'opinion_str': opinion_str,
             'opinion_int': opinion_int
         })
+    # Set display parameters
+    params['nav_active_curr'] = params['nav_active_main']
+    params['best_place_images'] = find_photo_url(2)
     return render_template('places.html', places=places_list, params=params)
 
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     global params
-    print('Logged in user:', params['username'])
+    editor = params['logged_in_user']
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     place_dict = {}
     for key in place:
         place_dict[key] = place[key]
     place_dict2 = {}
     place_dict2['_id'] = place_dict['_id']
-    if params['username'] == '':
+    if editor == '':
         place_dict2['status'] = 'anonymous'
     else:
-        if params['username'] in place['users'].keys():
+        if editor in place['users'].keys():
             place_dict2['status'] = 'contributor'
         else:
             place_dict2['status'] = 'visitor'
     place_dict2['place_name'] = place_dict['place_name']
     place_dict2['country'] = place_dict['country']
     if place_dict2['status'] == 'contributor':
-        place_dict2['my_opinion'] = int(place_dict['users'][params['username']]['my_opinion'])
-        place_dict2['is_visited'] = place_dict['users'][params['username']]['is_visited']
+        place_dict2['my_opinion'] = int(place_dict['users'][editor]['my_opinion'])
+        place_dict2['is_visited'] = place_dict['users'][editor]['is_visited']
     place_dict2['photo_urls'] = []
     place_dict2['websites'] = []
     place_dict2['comments'] = []
@@ -143,17 +150,16 @@ def place_details(place_id):
         if users[user]['comment'] != '':
             place_dict2['comments'].append(users[user]['comment'])
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
-    print('Place dict2:', place_dict2)
-    params["nav_active_curr"] = ["", "", "", "", "", ""]
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "", "", ""]
     return render_template('placedetails.html', place = place_dict2, params = params)
 
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     global params
+    editor = params['logged_in_user']
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    params["nav_active_curr"] = ["", "", "", "", "", ""]
-    editor = params['username']
     if not (editor in place['users'].keys()):
         new_user = {}
         new_user['my_opinion'] = int(0)
@@ -165,14 +171,26 @@ def edit_place_details(place_id):
         users[editor] = new_user
         places = mongodb.db.myRecPlaces
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "", "", ""]
     return render_template('editplacedetails.html', place=place, params=params, editor=editor)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
     global params
-    editor = params['username']
+    editor = params['logged_in_user']
     places = mongodb.db.myRecPlaces
+    # Update user-specific data
+    place = places.find_one({"_id": ObjectId(place_id)})
+    users = place['users']
+    users[editor]['my_opinion'] = int(request.form.get('my_opinion'))
+    users[editor]['is_visited'] = bool(request.form.get('is_visited'))
+    users[editor]['photo_url'] = request.form.get('photo_url')
+    users[editor]['website'] = request.form.get('website')
+    users[editor]['comment'] = request.form.get('comment')
+    places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+    # Update general data
     place = places.find_one({"_id": ObjectId(place_id)})
     place_modified = {}
     place_modified['place_name'] = request.form.get('place_name')
@@ -181,39 +199,38 @@ def update_place(place_id):
         country = 'not sure'
     update_countries(country)
     place_modified['country'] = country
+    place_modified['opinion'] = calculate_users_opinion(users)
     places.update_one({"_id": ObjectId(place_id)}, {"$set": place_modified})
-    users = place['users']
-    users[editor]['my_opinion'] = int(request.form.get('my_opinion'))
-    users[editor]['is_visited'] = bool(request.form.get('is_visited'))
-    users[editor]['photo_url'] = request.form.get('photo_url')
-    users[editor]['website'] = request.form.get('website')
-    users[editor]['comment'] = request.form.get('comment')
-    places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
 @app.route('/add_place')
 def add_place():
     global params
-    params["nav_active_curr"] = ["", "active", "", "", "", ""]
-    return render_template("addplace.html", params = params)
+    # Set display parameters
+    params['nav_active_curr'] = ["", "active", "", "", "", ""]
+    return render_template('addplace.html', params=params)
 
 
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
     global params
+    editor = params['logged_in_user']
     places = mongodb.db.myRecPlaces
     country = request.form.get('country')
     if country == '':
         country = 'not sure'
     update_countries(country)
-    my_opinion = int(request.form.get('my_opinion'))
+    opinion = float(request.form.get('my_opinion'))
+    my_opinion = int(opinion)
     is_visited = bool(request.form.get('is_visited'))
     places.insert_one({
         'place_name': request.form.get('place_name'),
         'country': country,
-        'added_by': params['username'],
+        'added_by': editor,
+        'opinion': opinion,
         'users': {
-            params['username']: {
+            editor: {
                 'my_opinion': my_opinion,
                 'is_visited': is_visited,
                 'website': request.form.get('website'),
@@ -228,39 +245,48 @@ def insert_place():
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
     global params
+    editor = params['logged_in_user']
     places = mongodb.db.myRecPlaces
+    #Delete user's record about the place
     place = places.find_one({"_id": ObjectId(place_id)})
-    if params['username'] == place['added_by']:
+    if editor == place['added_by']:
         places.remove({'_id': ObjectId(place_id)})
     else:
         users = place['users']
-        users.pop(params['username'])
+        users.pop(editor)
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+    #Update general data for the place
+    place = places.find_one({"_id": ObjectId(place_id)})
+    opinion = calculate_users_opinion(place['users'])
+    places.update_one({"_id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
 
 @app.route('/search')
 def search():
     global params
-    params["nav_active_curr"] = ["", "", "active", "", "", ""]
     countries = mongodb.db.countries.find().sort("country_name")
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "active", "", "", ""]
     return render_template("search.html", params = params, countries = countries)
 
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
     global params
-    params["nav_active_main"] = ["", "", "", "", "", ""]
-    params["title_to_display"] = "Selected places"
-    params["curr_page"] = 1
-    params["countries_to_display"] = request.form.getlist('country')
+    # Set display parameters
+    params['nav_active_main'] = ["", "", "", "", "", ""]
+    params['title_to_display'] = "Selected places"
+    params['curr_page'] = 1
+    params['countries_to_display'] = request.form.getlist('country')
     return redirect(url_for('display_places', page_number=1))
 
 
 @app.route('/login/<login_problem>')
 def login(login_problem):
     global params
-    params["nav_active_curr"] = ["", "", "", "", "active", ""]
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "", "active", ""]
     return render_template("login.html", params = params, login_problem = login_problem)
 
 
@@ -270,10 +296,10 @@ def sign_in():
     users = mongodb.db.users
     username = request.form.get('username')
     password = request.form.get('password')
-    if users.count_documents({"username": username}) == 1:
-        user = users.find_one({"username": username})
+    if users.count_documents({'username': username}) == 1:
+        user = users.find_one({'username': username})
         if user['password'] == password:
-            params['username'] = username
+            params['logged_in_user'] = username
             return redirect(url_for('get_all_places'))
     return render_template("login.html", params = params, login_problem = True)
 
@@ -281,15 +307,16 @@ def sign_in():
 @app.route('/logout')
 def logout():
     global params
-    params['username'] = ''
+    params['logged_in_user'] = ''
     return redirect(url_for('get_all_places'))
 
 
 @app.route('/sign_up/<signup_problem>')
 def sign_up(signup_problem):
     global params
-    params["nav_active_curr"] = ["", "", "", "", "", ""]
-    return render_template("signup.html", params = params, signup_problem = signup_problem)
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "", "active", ""]
+    return render_template('signup.html', params=params, signup_problem=signup_problem)
 
 
 @app.route('/insert_user', methods=["POST"])
@@ -298,7 +325,7 @@ def insert_user():
     users = mongodb.db.users
     username = request.form.get('username')
     password = request.form.get('password')
-    if users.count_documents({"username": username}) == 0 and username != '':
+    if users.count_documents({'username': username}) == 0 and username != '':
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem = False))
     return render_template("signup.html", params = params, signup_problem = True)

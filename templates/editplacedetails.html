@@ -74,9 +74,7 @@
         <div class="form-group row align-items-center ml-0 mt-2 mb-4">
             <label for="comment"><strong>comment: </strong></label>
             {% if place.users[editor].comment %}
-                <textarea id="comment" name="comment" class="form-control" rows="15" value="{{ place.users[editor].comment }}">
-                    {{ place.users[editor].comment }}
-                </textarea>
+                <textarea id="comment" name="comment" class="form-control" rows="15" value="{{ place.users[editor].comment }}">{{ place.users[editor].comment }}</textarea>
             {% else %}
                 <textarea id="comment" name="comment" class="form-control" rows="15" placeholder="Please, write your comments here."></textarea>
             {% endif %}
