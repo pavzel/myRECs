@@ -26,14 +26,13 @@ app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
 mongodb = PyMongo(app)
 
 
-def find_photo_url(value):
+def get_photos_of_best_places(value, number):
     best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } })
     best_place_images = []
     for place in best_places:
-        if 'photo_url' in place.keys():
-            best_place_images.append(place["photo_url"])
+        best_place_images.append(get_random_photo(place['users']))
     random.shuffle(best_place_images)
-    return best_place_images
+    return best_place_images[0:number]
 
 
 def update_countries(country):
@@ -112,7 +111,7 @@ def display_places(page_number):
         })
     # Set display parameters
     params['nav_active_curr'] = params['nav_active_main']
-    params['best_place_images'] = find_photo_url(2)
+    params['best_place_images'] = get_photos_of_best_places(1, 3)
     return render_template('places.html', places=places_list, params=params)
 
 
