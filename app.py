@@ -339,6 +339,12 @@ def insert_user():
         return redirect(url_for('login', login_problem = False))
     return render_template("signup.html", params = params, signup_problem = True)
 
+@app.route('/help')
+def help():
+    global params
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "", "", "active"]
+    return render_template('help.html', params=params)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
