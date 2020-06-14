@@ -30,7 +30,9 @@ def get_photos_of_best_places(value, number):
     best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } })
     best_place_images = []
     for place in best_places:
-        best_place_images.append(get_random_photo(place['users']))
+        place_photo = get_random_photo(place['users'])
+        if not (place_photo is None):
+            best_place_images.append(place_photo)
     random.shuffle(best_place_images)
     return best_place_images[0:number]
 
@@ -69,7 +71,11 @@ def get_random_photo(users):
         if photo_url != '':
             users_photos.append(users[user]['photo_url'])
     random.shuffle(users_photos)
-    return users_photos[0]
+    if len(users_photos) == 0:
+        output_url = None
+    else:
+        output_url = users_photos[0]
+    return output_url
 
 
 @app.route('/')
@@ -101,6 +107,8 @@ def display_places(page_number):
     for place in places:
         place_name = place['place_name']
         photo_url = get_random_photo(place['users'])
+        if photo_url is None:
+            photo_url = 'https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet'
         opinion_str, opinion_int = get_users_opinion(place['users'])
         places_list.append({
             '_id': place['_id'],
@@ -148,6 +156,8 @@ def place_details(place_id):
             place_dict2['websites'].append(users[user]['website'])
         if users[user]['comment'] != '':
             place_dict2['comments'].append(users[user]['comment'])
+    if len(place_dict2['photo_urls']) == 0:
+        place_dict2['photo_urls'] = ['https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet']
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
