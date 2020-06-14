@@ -36,7 +36,11 @@
                 <a class="nav-link" href="{{ url_for('search') }}">Search</a>
             </li>
             <li class="nav-item {{ params.nav_active_curr[3] }}">
-                <a class="nav-link" href="">Recommendations</a>
+                {% if params.logged_in_user == '' %}
+                    <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Recommendations</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('recommend') }}">Recommendations</a>
+                {% endif %}
             </li>
             <li class="nav-item {{ params.nav_active_curr[4] }}">
                 {% if params.logged_in_user == '' %}

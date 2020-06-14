@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="row my-5">
+        <div class="col">
+            <h1>RECs for you</h1>
+            {% for user in users %}
+                <p>{{ user }}: {{ users[user] }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}

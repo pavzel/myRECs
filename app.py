@@ -213,6 +213,7 @@ def update_place(place_id):
 
     return redirect(url_for('display_places', page_number=params["curr_page"]))
 
+
 @app.route('/add_place')
 def add_place():
     global params
@@ -339,12 +340,49 @@ def insert_user():
         return redirect(url_for('login', login_problem = False))
     return render_template("signup.html", params = params, signup_problem = True)
 
+
 @app.route('/help')
 def help():
     global params
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", "active"]
     return render_template('help.html', params=params)
+
+
+@app.route('/recommend')
+def recommend():
+    global params
+    # Extract data about all places
+    place_list = []
+    place_dict = {}
+    places = mongodb.db.myRecPlaces.find()
+    for place in places:
+        place_list.append(place['_id'])
+        place_dict[place['_id']] = place['users']
+    # Extract data about all users
+    user_list = []
+    user_dict = {}
+    users = mongodb.db.users.find()
+    for user in users:
+        user_list.append(user['username'])
+        user_dict[user['username']] = {}
+    # Extract relevant data about all users and all places
+    for place_id in place_dict:
+        users_in_place = place_dict[place_id]
+        for username in user_dict:
+            try:
+                user_in_place = users_in_place[username]
+            except:
+                pass
+            else:
+                user_dict[username][place_id] = {
+                    'is_visited': user_in_place['is_visited'],
+                    'opinion': user_in_place['my_opinion']
+                }
+    # Set display parameters
+    params['nav_active_curr'] = ["", "", "", "active", "", ""]
+    return render_template('recommend.html', params=params, users=user_dict)
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
