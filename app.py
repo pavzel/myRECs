@@ -379,6 +379,32 @@ def recommend():
                     'is_visited': user_in_place['is_visited'],
                     'opinion': user_in_place['my_opinion']
                 }
+    # Calculate similarities
+    my_name = params['logged_in_user']
+    user_list.remove(my_name)
+    my_opinions = user_dict[my_name]
+    user_dict.pop(my_name)
+    similarity = {}
+    for username in user_list:
+        user_opinions = user_dict[username]
+        coor = []
+        for place in my_opinions:
+            if my_opinions[place]['is_visited'] is True:
+                my_opinion = my_opinions[place]['opinion']
+                try:
+                    place_is_visited = user_opinions[place]['is_visited']
+                except:
+                    pass
+                else:
+                    if place_is_visited is True:
+                        user_opinion = user_opinions[place]['opinion']
+                        coor.append({'x': my_opinion, 'y': user_opinion})
+        if len(coor) > 0:
+            sum_d2 = 0
+            for point in coor:
+                sum_d2 += pow(point['x'] - point['y'], 2)
+            similarity[username] = 1 - pow(sum_d2 / len(coor), 0.5) / 6
+    print("Similarity: ", similarity)
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "active", "", ""]
     return render_template('recommend.html', params=params, users=user_dict)
