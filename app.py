@@ -136,7 +136,7 @@ def place_details(place_id):
     if editor == '':
         place_dict2['status'] = 'anonymous'
     else:
-        if editor in place['users'].keys():
+        if editor in place['users']:
             place_dict2['status'] = 'contributor'
         else:
             place_dict2['status'] = 'visitor'
@@ -169,7 +169,7 @@ def edit_place_details(place_id):
     global params
     editor = params['logged_in_user']
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
-    if not (editor in place['users'].keys()):
+    if not (editor in place['users']):
         new_user = {}
         new_user['my_opinion'] = int(0)
         new_user['is_visited'] = bool(False)
@@ -370,20 +370,18 @@ def recommend():
     for place_id in place_dict:
         users_in_place = place_dict[place_id]
         for username in user_dict:
-            try:
+            if username in users_in_place:
                 user_in_place = users_in_place[username]
-            except:
-                pass
-            else:
                 user_dict[username][place_id] = {
                     'is_visited': user_in_place['is_visited'],
                     'opinion': user_in_place['my_opinion']
                 }
-    # Calculate similarities
+    # Separate my data from the other users' data
     my_name = params['logged_in_user']
     user_list.remove(my_name)
     my_opinions = user_dict[my_name]
     user_dict.pop(my_name)
+    # Calculate similarities
     similarity = {}
     for username in user_list:
         user_opinions = user_dict[username]
@@ -391,12 +389,8 @@ def recommend():
         for place in my_opinions:
             if my_opinions[place]['is_visited'] is True:
                 my_opinion = my_opinions[place]['opinion']
-                try:
-                    place_is_visited = user_opinions[place]['is_visited']
-                except:
-                    pass
-                else:
-                    if place_is_visited is True:
+                if place in user_opinions:
+                    if user_opinions[place]['is_visited'] is True:
                         user_opinion = user_opinions[place]['opinion']
                         coor.append({'x': my_opinion, 'y': user_opinion})
         if len(coor) > 0:
@@ -407,7 +401,7 @@ def recommend():
     print("Similarity: ", similarity)
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "active", "", ""]
-    return render_template('recommend.html', params=params, users=user_dict)
+    return render_template('recommend.html', params=params, similarity=similarity)
 
 
 if __name__ == '__main__':
