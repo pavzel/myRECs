@@ -398,10 +398,27 @@ def recommend():
             for point in coor:
                 sum_d2 += pow(point['x'] - point['y'], 2)
             similarity[username] = 1 - pow(sum_d2 / len(coor), 0.5) / 6
-    print("Similarity: ", similarity)
+    # Find recommendations
+    recs = {}
+    for place in place_list:
+        if (place in my_opinions) and (my_opinions[place]['is_visited'] is True):
+            continue
+        else:
+            sum_opinions = 0
+            sum_similarities = 0
+            for user in similarity:
+                user_opinions = user_dict[user]
+                if place in user_opinions:
+                    if user_opinions[place]['is_visited'] is True:
+                        sum_opinions += user_opinions[place]['opinion'] * similarity[user]
+                        sum_similarities += similarity[user]
+            if sum_similarities > 0:
+                recs[place] = round(sum_opinions / sum_similarities, 2)
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "active", "", ""]
-    return render_template('recommend.html', params=params, similarity=similarity)
+    rec_list = list(recs.keys())
+    rec_places = mongodb.db.myRecPlaces.find({"_id": {"$in": rec_list} })
+    return render_template('recommend.html', params=params, places=rec_places, recs=recs)
 
 
 if __name__ == '__main__':

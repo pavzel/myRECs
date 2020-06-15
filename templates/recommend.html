@@ -6,8 +6,8 @@
     <div class="row my-5">
         <div class="col">
             <h1>RECs for you</h1>
-            {% for user in similarity %}
-                <p>{{ user }}: {{ similarity[user] }}</p>
+            {% for place in places %}
+                <p>{{ place.place_name }}: {{ recs[place._id] }}</p>
             {% endfor %}
         </div>
     </div>
