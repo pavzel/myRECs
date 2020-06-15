@@ -78,6 +78,26 @@
                     {{ place.opinion_str }}
                 {% endif %}
             </p>
+            {% if params['is_rec'] %}
+                <p class="text-danger">
+                    <strong>RECommendation: </strong>
+                    {% if place.rec_int > 0 %}
+                        {{ place.rec_str }}
+                        {% for i in range(place.rec_int) %}
+                            <i class="fa fa-thumbs-up"></i>
+                        {% endfor %}
+                    {% endif %}
+                    {% if place.rec_int < 0 %}
+                        {{ place.rec_str }}
+                        {% for i in range(-place.rec_int) %}
+                            <i class="fa fa-thumbs-down"></i>
+                        {% endfor %}
+                    {% endif %}
+                    {% if place.rec_int == 0 %}
+                        {{ place.rec_str }}
+                    {% endif %}
+                </p>
+            {% endif %}
             {% if place.country %}
                 <p>
                     <strong>country: </strong>

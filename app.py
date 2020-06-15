@@ -9,11 +9,13 @@ if os.path.exists("env.py"):
 
 
 params = {  "logged_in_user": '',
+            "place_opinion": {},
+            "is_rec": False,
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
             "best_place_images": [],
-            "title_to_display": "All places",
+            "title_to_display": "All places:",
             "per_page": 15,
             "max_page": 1,
             "curr_page": 1}
@@ -54,14 +56,18 @@ def calculate_users_opinion(users):
     return users_opinion
 
 
+def float_to_str_int(opinion):
+    if opinion > 0:
+        opinion_str = '+' + str(round(opinion, 2))
+    else:
+        opinion_str = str(round(opinion, 2))
+    opinion_int = int(round(opinion))
+    return opinion_str, opinion_int
+
+
 def get_users_opinion(users):
     users_opinion = calculate_users_opinion(users)
-    if users_opinion > 0:
-        opinion_str = '+' + str(round(users_opinion, 2))
-    else:
-        opinion_str = str(round(users_opinion, 2))
-    opinion_int = int(round(users_opinion))
-    return opinion_str, opinion_int
+    return float_to_str_int(users_opinion)
 
 
 def get_random_photo(users):
@@ -83,12 +89,14 @@ def get_all_places():
     global params
     # Set display parameters
     params['nav_active_main'] = ["active", "", "", "", "", ""]
-    params['title_to_display'] = "All places"
+    params['title_to_display'] = "All places:"
     params['curr_page'] = 1
-    params['countries_to_display'].clear()
-    countries = mongodb.db.countries.find().sort('country_name')
-    for country in countries:
-        params['countries_to_display'].append(country['country_name'])
+    params['is_rec'] = False
+    # Prepare place_opinion dictionary
+    places = mongodb.db.myRecPlaces.find()
+    params['place_opinion'] = {}
+    for place in places:
+        params['place_opinion'][place['_id']] = place['opinion']
     return redirect(url_for('display_places', page_number=1))
 
 
@@ -96,24 +104,47 @@ def get_all_places():
 def display_places(page_number):
     global params
     # Select places to display
-    number_of_places_to_display = mongodb.db.myRecPlaces.count_documents({"country": { "$in": params["countries_to_display"] } })
-    params["max_page"] = math.ceil(number_of_places_to_display / params["per_page"])
+    place_opinion = params['place_opinion']
+    # Calculate the range of documents to display
+    total_number_of_places = len(place_opinion)
+    params["max_page"] = math.ceil(total_number_of_places / params["per_page"])
     params["curr_page"] = int(page_number)
     index_min = params["per_page"] * (params["curr_page"] - 1)
     index_max = params["per_page"] * params["curr_page"]
-    places = mongodb.db.myRecPlaces.find({"country": { "$in": params["countries_to_display"] } }).sort("opinion", -1)[index_min:index_max]
-    # For the selected places, prepare a list with essential data
-    places_list = []
+    if index_max > total_number_of_places:
+        index_max = index_min + total_number_of_places % params["per_page"]
+    # Sorting of places according to opinion
+    list_for_sorting = []
+    for place in place_opinion:
+        list_for_sorting.append((place, place_opinion[place]))
+    list_sorted = sorted(list_for_sorting, key=lambda tuple: tuple[1], reverse=True)
+    # Out of the sorted list choose only those places that must be displayed on the current page
+    place_id_list = []
+    for index in range(index_min, index_max):
+        place_id_list.append(list_sorted[index][0])
+    # Get data places that must be displayed and save them in a dictionary 
+    places = mongodb.db.myRecPlaces.find({"_id": { "$in": place_id_list } })
+    places_dict = {}
     for place in places:
+        places_dict[place['_id']] = place
+    # For the selected places, prepare a list with data essential for display
+    places_list = []
+    for place_id in place_id_list:
+        place = places_dict[place_id]
         place_name = place['place_name']
         photo_url = get_random_photo(place['users'])
         if photo_url is None:
             photo_url = 'https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet'
-        opinion_str, opinion_int = get_users_opinion(place['users'])
+        if params['is_rec'] is True:
+            footer_text = "RECommendation:"
+        else:
+            footer_text = "Users' opinion:"
+        opinion_str, opinion_int = float_to_str_int(place_opinion[place_id])
         places_list.append({
             '_id': place['_id'],
             'photo_url': photo_url,
             'place_name': place_name,
+            'footer_text': footer_text,
             'opinion_str': opinion_str,
             'opinion_int': opinion_int
         })
@@ -159,6 +190,7 @@ def place_details(place_id):
     if len(place_dict2['photo_urls']) == 0:
         place_dict2['photo_urls'] = ['https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet']
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
+    place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
     return render_template('placedetails.html', place = place_dict2, params = params)
@@ -286,9 +318,15 @@ def get_selected_places():
     global params
     # Set display parameters
     params['nav_active_main'] = ["", "", "", "", "", ""]
-    params['title_to_display'] = "Selected places"
+    params['title_to_display'] = "Selected places:"
     params['curr_page'] = 1
-    params['countries_to_display'] = request.form.getlist('country')
+    params['is_rec'] = False
+    # Prepare place_opinion dictionary
+    selected_countries = request.form.getlist('country')
+    places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}})
+    params['place_opinion'] = {}
+    for place in places:
+        params['place_opinion'][place['_id']] = place['opinion']
     return redirect(url_for('display_places', page_number=1))
 
 
@@ -415,10 +453,13 @@ def recommend():
             if sum_similarities > 0:
                 recs[place] = round(sum_opinions / sum_similarities, 2)
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "active", "", ""]
-    rec_list = list(recs.keys())
-    rec_places = mongodb.db.myRecPlaces.find({"_id": {"$in": rec_list} })
-    return render_template('recommend.html', params=params, places=rec_places, recs=recs)
+    params['nav_active_main'] = ["", "", "", "active", "", ""]
+    params['title_to_display'] = "RECommended places:"
+    params['curr_page'] = 1
+    params['is_rec'] = True
+    params['place_opinion'] = recs
+    return redirect(url_for('display_places', page_number=1))
+    #return render_template('recommend.html', params=params, places=rec_places, recs=recs)
 
 
 if __name__ == '__main__':
