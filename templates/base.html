@@ -13,47 +13,47 @@
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-        <div class="container">
-        <a class="navbar-brand" href="{{ url_for('get_all_places') }}">myRECs</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-            <li class="nav-item {{ params.nav_active_curr[0] }}">
-                <a class="nav-link" href="{{ url_for('get_all_places') }}">Home
-                <span class="sr-only">(current)</span>
-                </a>
-            </li>
-            <li class="nav-item {{ params.nav_active_curr[1] }}">
-                {% if params.logged_in_user == '' %}
-                    <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Add place</a>
-                {% else %}
-                    <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
-                {% endif %}
-            </li>
-            <li class="nav-item {{ params.nav_active_curr[2] }}">
-                <a class="nav-link" href="{{ url_for('search') }}">Search</a>
-            </li>
-            <li class="nav-item {{ params.nav_active_curr[3] }}">
-                {% if params.logged_in_user == '' %}
-                    <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Recommendations</a>
-                {% else %}
-                    <a class="nav-link" href="{{ url_for('recommend') }}">Recommendations</a>
-                {% endif %}
-            </li>
-            <li class="nav-item {{ params.nav_active_curr[4] }}">
-                {% if params.logged_in_user == '' %}
-                    <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Login</a>
-                {% else %}
-                    <a class="nav-link" href="{{ url_for('logout') }}">Logout (<em>{{ params.logged_in_user }}</em>)</a>
-                {% endif %}
-            </li>
-            <li class="nav-item {{ params.nav_active_curr[5] }}">
-                <a class="nav-link" href="{{ url_for('help') }}">Help</a>
-            </li>
-            </ul>
-        </div>
+        <div class="container py-1">
+            <a class="navbar-brand" href="{{ url_for('get_all_places') }}">myRECs</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ml-auto">
+                <li class="nav-item {{ params.nav_active_curr[0] }}">
+                    <a class="nav-link" href="{{ url_for('get_all_places') }}">Home
+                    <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ params.nav_active_curr[1] }}">
+                    {% if params.logged_in_user == '' %}
+                        <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Add place</a>
+                    {% else %}
+                        <a class="nav-link" href="{{ url_for('add_place') }}">Add place</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item {{ params.nav_active_curr[2] }}">
+                    <a class="nav-link" href="{{ url_for('search') }}">Select countries</a>
+                </li>
+                <li class="nav-item {{ params.nav_active_curr[3] }}">
+                    {% if params.logged_in_user == '' %}
+                        <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">RECommended</a>
+                    {% else %}
+                        <a class="nav-link" href="{{ url_for('recommend') }}">RECommended</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item {{ params.nav_active_curr[4] }}">
+                    {% if params.logged_in_user == '' %}
+                        <a class="nav-link" href="{{ url_for('login', login_problem = False) }}">Login</a>
+                    {% else %}
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout (<em>{{ params.logged_in_user }}</em>)</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item {{ params.nav_active_curr[5] }}">
+                    <a class="nav-link" href="{{ url_for('help') }}">Help</a>
+                </li>
+                </ul>
+            </div>
         </div>
     </nav>
 

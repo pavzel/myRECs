@@ -297,11 +297,11 @@ def delete_place(place_id):
         users = place['users']
         users.pop(editor)
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
-    #Update general data for the place
-    place = places.find_one({"_id": ObjectId(place_id)})
-    opinion = calculate_users_opinion(place['users'])
-    places.update_one({"_id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
-    return redirect(url_for('display_places', page_number=params["curr_page"]))
+        #Update users' opinion for the place
+        place = places.find_one({"_id": ObjectId(place_id)})
+        opinion = calculate_users_opinion(place['users'])
+        places.update_one({"_id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
+    return redirect(url_for('get_all_places'))
 
 
 @app.route('/search')

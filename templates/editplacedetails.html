@@ -16,7 +16,7 @@
                 <div class="form-group">
                     <h1 class="input-field">
                         {% if editor == place.added_by %}
-                            <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}">
+                            <input id="place_name" type="text" name="place_name" class="validate font-weight-light col-12" value="{{ place.place_name }}" required>
                         {% else %}
                             <input id="place_name" type="text" name="place_name" class="font-weight-light col-12" value="{{ place.place_name }}" readonly>
                         {% endif %}
@@ -29,7 +29,7 @@
                 <div class="form-group">
                     <label for="country"><strong>country: </strong></label>
                     {% if editor == place.added_by %}
-                        <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}">
+                        <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" required>
                     {% else %}
                         <input id="country" type="text" name="country" class="validate form-control" value="{{ place.country }}" readonly>
                     {% endif %}
