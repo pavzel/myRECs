@@ -82,13 +82,8 @@
     </form>
 </div>
 <br>
+{% endblock %}
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-<script>
-    const slider = document.getElementById("my_opinion");
-    const output = document.getElementById("current_opinion");
-    slider.oninput = function() {output.innerHTML = this.value;}
-</script>
-
+{% block javascript %}
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
