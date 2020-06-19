@@ -1,14 +1,14 @@
 import os
 import math
 import random
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, render_template, redirect, request, url_for, session
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 if os.path.exists("env.py"):
     import env
 
 
-params = {  "logged_in_user": '',
+params = {  #"logged_in_user": '',
             "place_opinion": {},
             "is_rec": False,
             "countries_to_display": [],
@@ -24,6 +24,7 @@ app = Flask(__name__)
 
 app.config["MONGO_DBNAME"] = 'myRecsDB'
 app.config["MONGO_URI"] = os.environ.get('MONGO_URI')
+app.secret_key = os.environ.get("SECRET")
 
 mongodb = PyMongo(app)
 
@@ -151,13 +152,17 @@ def display_places(page_number):
     # Set display parameters
     params['nav_active_curr'] = params['nav_active_main']
     params['best_place_images'] = get_photos_of_best_places(1, 3)
-    return render_template('places.html', places=places_list, params=params)
+    return render_template('places.html', places=places_list, params=params, session=session)
 
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
     global params
-    editor = params['logged_in_user']
+    #editor = params['logged_in_user']
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        editor = ''
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     place_dict = {}
     for key in place:
@@ -193,13 +198,17 @@ def place_details(place_id):
     place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
-    return render_template('placedetails.html', place = place_dict2, params = params)
+    return render_template('placedetails.html', place = place_dict2, params = params, session=session)
 
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
     global params
-    editor = params['logged_in_user']
+    #editor = params['logged_in_user']
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        editor = ''
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     if not (editor in place['users']):
         new_user = {}
@@ -214,13 +223,17 @@ def edit_place_details(place_id):
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
-    return render_template('editplacedetails.html', place=place, params=params, editor=editor)
+    return render_template('editplacedetails.html', place=place, params=params, editor=editor, session=session)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
     global params
-    editor = params['logged_in_user']
+    #editor = params['logged_in_user']
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        editor = ''
     places = mongodb.db.myRecPlaces
     # Update user-specific data
     place = places.find_one({"_id": ObjectId(place_id)})
@@ -251,13 +264,17 @@ def add_place():
     global params
     # Set display parameters
     params['nav_active_curr'] = ["", "active", "", "", "", ""]
-    return render_template('addplace.html', params=params)
+    return render_template('addplace.html', params=params, session=session)
 
 
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
     global params
-    editor = params['logged_in_user']
+    #editor = params['logged_in_user']
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        editor = ''
     places = mongodb.db.myRecPlaces
     country = request.form.get('country')
     if country == '':
@@ -287,7 +304,11 @@ def insert_place():
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
     global params
-    editor = params['logged_in_user']
+    #editor = params['logged_in_user']
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        editor = ''
     places = mongodb.db.myRecPlaces
     #Delete user's record about the place
     place = places.find_one({"_id": ObjectId(place_id)})
@@ -310,7 +331,7 @@ def search():
     countries = mongodb.db.countries.find().sort("country_name")
     # Set display parameters
     params['nav_active_curr'] = ["", "", "active", "", "", ""]
-    return render_template("search.html", params = params, countries = countries)
+    return render_template("search.html", params = params, countries = countries, session=session)
 
 
 @app.route('/get_selested_places', methods=["POST"])
@@ -335,7 +356,7 @@ def login(login_problem):
     global params
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "active", ""]
-    return render_template("login.html", params = params, login_problem = login_problem)
+    return render_template("login.html", params = params, login_problem = login_problem, session=session)
 
 
 @app.route('/sign_in', methods=["POST"])
@@ -347,15 +368,17 @@ def sign_in():
     if users.count_documents({'username': username}) == 1:
         user = users.find_one({'username': username})
         if user['password'] == password:
-            params['logged_in_user'] = username
+            #params['logged_in_user'] = username
+            session['logged_in_user'] = username
             return redirect(url_for('get_all_places'))
-    return render_template("login.html", params = params, login_problem = True)
+    return render_template("login.html", params = params, login_problem = True, session=session)
 
 
 @app.route('/logout')
 def logout():
     global params
-    params['logged_in_user'] = ''
+    #params['logged_in_user'] = ''
+    session.pop('logged_in_user', None)
     return redirect(url_for('get_all_places'))
 
 
@@ -364,7 +387,7 @@ def sign_up(signup_problem):
     global params
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "active", ""]
-    return render_template('signup.html', params=params, signup_problem=signup_problem)
+    return render_template('signup.html', params=params, signup_problem=signup_problem, session=session)
 
 
 @app.route('/insert_user', methods=["POST"])
@@ -376,7 +399,7 @@ def insert_user():
     if users.count_documents({'username': username}) == 0 and username != '':
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem = False))
-    return render_template("signup.html", params = params, signup_problem = True)
+    return render_template("signup.html", params = params, signup_problem = True, session=session)
 
 
 @app.route('/help')
@@ -384,7 +407,7 @@ def help():
     global params
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", "active"]
-    return render_template('help.html', params=params)
+    return render_template('help.html', params=params, session=session)
 
 
 @app.route('/recommend')
@@ -415,7 +438,8 @@ def recommend():
                     'opinion': user_in_place['my_opinion']
                 }
     # Separate my data from the other users' data
-    my_name = params['logged_in_user']
+    #my_name = params['logged_in_user']
+    my_name = session['logged_in_user']
     user_list.remove(my_name)
     my_opinions = user_dict[my_name]
     user_dict.pop(my_name)
@@ -459,7 +483,6 @@ def recommend():
     params['is_rec'] = True
     params['place_opinion'] = recs
     return redirect(url_for('display_places', page_number=1))
-    #return render_template('recommend.html', params=params, places=rec_places, recs=recs)
 
 
 if __name__ == '__main__':
