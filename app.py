@@ -81,16 +81,19 @@ def read_from_buffer():
     return place_opinion
 
 
-
-@app.route('/')
-def get_all_places():
-    # Read "_id" and "opinion" for all places, save them in "buffer" collection
-    places = mongodb.db.myRecPlaces.find({}, {'opinion': 1})
+def write_to_buffer(places):
     buff_dict = []
     for place in places:
         buff_dict.append({"id": place['_id'], "opinion": place['opinion']})
     mongodb.db.buffer.delete_many({})
     mongodb.db.buffer.insert_many(buff_dict)
+
+
+@app.route('/')
+def get_all_places():
+    # Read "_id" and "opinion" for all places, save them in "buffer" collection
+    places = mongodb.db.myRecPlaces.find({}, {'opinion': 1})
+    write_to_buffer(places)
     # Set display parameters
     session['nav_main'] = ["active", "", "", "", "", ""]
     session['title'] = "All places:"
@@ -187,7 +190,7 @@ def place_details(place_id):
     if len(place_dict2['photo_urls']) == 0:
         place_dict2['photo_urls'] = ['https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet']
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
-    # If the place is RECommended then retrieve REC-opinion
+    # If the place is RECommended then add REC-opinion to "place" dictionary
     if session['is_rec']:
         place_opinion = read_from_buffer()
         rec_opinion = place_opinion[ObjectId(place_id)]
@@ -324,11 +327,7 @@ def get_selected_places():
     # Read "_id" and "opinion" for all places, save them in "buffer" collection
     selected_countries = request.form.getlist('country')
     places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}}, {'opinion': 1})
-    buff_dict = []
-    for place in places:
-        buff_dict.append({"id": place['_id'], "opinion": place['opinion']})
-    mongodb.db.buffer.delete_many({})
-    mongodb.db.buffer.insert_many(buff_dict)
+    write_to_buffer(places)
     # Set display parameters
     session['nav_main'] = ["", "", "active", "", "", ""]
     session['title'] = "Selected places:"
