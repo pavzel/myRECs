@@ -14,7 +14,6 @@ params = {  "place_opinion": {},
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
             "title_to_display": "All places:",
-            "per_page": 15,
             "max_page": 1,
             "curr_page": 1}
 
@@ -102,16 +101,17 @@ def get_all_places():
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
     global params
+    PER_PAGE = 15
     # Select places to display
     place_opinion = params['place_opinion']
     # Calculate the range of documents to display
     total_number_of_places = len(place_opinion)
-    params["max_page"] = math.ceil(total_number_of_places / params["per_page"])
+    params["max_page"] = math.ceil(total_number_of_places / PER_PAGE)
     params["curr_page"] = int(page_number)
-    index_min = params["per_page"] * (params["curr_page"] - 1)
-    index_max = params["per_page"] * params["curr_page"]
+    index_min = PER_PAGE * (params["curr_page"] - 1)
+    index_max = PER_PAGE * params["curr_page"]
     if index_max > total_number_of_places:
-        index_max = index_min + total_number_of_places % params["per_page"]
+        index_max = index_min + total_number_of_places % PER_PAGE
     # Sorting of places according to opinion
     list_for_sorting = []
     for place in place_opinion:
