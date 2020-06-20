@@ -143,7 +143,7 @@ def display_places(page_number):
     # Set display parameters
     session['nav_curr'] = session['nav_main']
     head_imgs = get_photos_of_best_places(1)
-    return render_template('places.html', places=places_list, params=params, max_page=max_page, head_imgs=head_imgs, session=session)
+    return render_template('places.html', places=places_list, max_page=max_page, head_imgs=head_imgs, session=session)
 
 
 @app.route('/place_details/<place_id>')
@@ -182,12 +182,11 @@ def place_details(place_id):
     place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", ""]
-    return render_template('place.html', place = place_dict2, params = params, session=session)
+    return render_template('place.html', place= lace_dict2, session=session)
 
 
 @app.route('/edit_place_details/<place_id>')
 def edit_place_details(place_id):
-    global params
     if 'logged_in_user' in session:
         editor = session['logged_in_user']
     else:
@@ -206,12 +205,11 @@ def edit_place_details(place_id):
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", ""]
-    return render_template('editplace.html', place=place, params=params, editor=editor, session=session)
+    return render_template('editplace.html', place=place, editor=editor, session=session)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
 def update_place(place_id):
-    global params
     if 'logged_in_user' in session:
         editor = session['logged_in_user']
     else:
@@ -242,15 +240,13 @@ def update_place(place_id):
 
 @app.route('/add_place')
 def add_place():
-    global params
     # Set display parameters
     session['nav_curr'] = ["", "active", "", "", "", ""]
-    return render_template('addplace.html', params=params, session=session)
+    return render_template('addplace.html', session=session)
 
 
 @app.route('/insert_place', methods=["POST"])
 def insert_place():
-    global params
     if 'logged_in_user' in session:
         editor = session['logged_in_user']
     else:
@@ -283,7 +279,6 @@ def insert_place():
 
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
-    global params
     if 'logged_in_user' in session:
         editor = session['logged_in_user']
     else:
@@ -306,11 +301,10 @@ def delete_place(place_id):
 
 @app.route('/search')
 def search():
-    global params
     countries = mongodb.db.countries.find().sort("country_name")
     # Set display parameters
     session['nav_curr'] = ["", "", "active", "", "", ""]
-    return render_template("select.html", params = params, countries = countries, session=session)
+    return render_template("select.html", countries=countries, session=session)
 
 
 @app.route('/get_selested_places', methods=["POST"])
@@ -332,15 +326,13 @@ def get_selected_places():
 
 @app.route('/login/<login_problem>')
 def login(login_problem):
-    global params
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "active", ""]
-    return render_template("login.html", params = params, login_problem = login_problem, session=session)
+    return render_template("login.html", login_problem=login_problem, session=session)
 
 
 @app.route('/sign_in', methods=["POST"])
 def sign_in():
-    global params
     users = mongodb.db.users
     username = request.form.get('username')
     password = request.form.get('password')
@@ -349,42 +341,38 @@ def sign_in():
         if user['password'] == password:
             session['logged_in_user'] = username
             return redirect(url_for('get_all_places'))
-    return render_template("login.html", params = params, login_problem = True, session=session)
+    return render_template("login.html", login_problem = True, session=session)
 
 
 @app.route('/logout')
 def logout():
-    global params
     session.pop('logged_in_user', None)
     return redirect(url_for('get_all_places'))
 
 
 @app.route('/sign_up/<signup_problem>')
 def sign_up(signup_problem):
-    global params
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "active", ""]
-    return render_template('signup.html', params=params, signup_problem=signup_problem, session=session)
+    return render_template('signup.html', signup_problem=signup_problem, session=session)
 
 
 @app.route('/insert_user', methods=["POST"])
 def insert_user():
-    global params
     users = mongodb.db.users
     username = request.form.get('username')
     password = request.form.get('password')
     if users.count_documents({'username': username}) == 0 and username != '':
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem = False))
-    return render_template('signup.html', params = params, signup_problem = True, session=session)
+    return render_template('signup.html', signup_problem = True, session=session)
 
 
 @app.route('/help')
 def help():
-    global params
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", "active"]
-    return render_template('help.html', params=params, session=session)
+    return render_template('help.html', session=session)
 
 
 @app.route('/recommend')
