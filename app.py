@@ -14,7 +14,6 @@ params = {  "place_opinion": {},
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
             "title_to_display": "All places:",
-            "max_page": 1,
             "curr_page": 1}
 
 app = Flask(__name__)
@@ -106,7 +105,7 @@ def display_places(page_number):
     place_opinion = params['place_opinion']
     # Calculate the range of documents to display
     total_number_of_places = len(place_opinion)
-    params["max_page"] = math.ceil(total_number_of_places / PER_PAGE)
+    max_page = math.ceil(total_number_of_places / PER_PAGE)
     params["curr_page"] = int(page_number)
     index_min = PER_PAGE * (params["curr_page"] - 1)
     index_max = PER_PAGE * params["curr_page"]
@@ -150,7 +149,7 @@ def display_places(page_number):
     # Set display parameters
     params['nav_active_curr'] = params['nav_active_main']
     head_imgs = get_photos_of_best_places(1)
-    return render_template('places.html', places=places_list, params=params, head_imgs=head_imgs, session=session)
+    return render_template('places.html', places=places_list, params=params, max_page=max_page, head_imgs=head_imgs, session=session)
 
 
 @app.route('/place_details/<place_id>')
