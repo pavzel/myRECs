@@ -2,16 +2,16 @@
 
 {% block content %}
 <br>
-<div class="container">
+<div class="container pt-3">
     <div class="row justify-content-center mt-5">
         <div class="col-lg-5">
-            <h1>Search for</h1>
+            <h1>Select</h1>
         </div>
     </div>
     <div class="row align-items-center justify-content-center my-3">
         <form action="{{ url_for('get_selected_places') }} " method="POST" class="col-lg-5">
             <div class="form-group">
-                <label for="country"><strong>select countries: </strong></label>
+                <label for="country"><strong>countries: </strong></label>
                 <select multiple id="country" name="country" class="form-control">
                     {% for country in countries %}
                         <option value="{{ country.country_name }}">{{ country.country_name }}</option>

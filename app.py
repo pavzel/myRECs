@@ -10,10 +10,7 @@ if os.path.exists("env.py"):
 
 params = {  "place_opinion": {},
             "is_rec": False,
-            "countries_to_display": [],
-            "nav_active_main": ["active", "", "", "", "", ""],
-            "nav_active_curr": ["active", "", "", "", "", ""],
-            "title_to_display": "All places:"}
+            "countries_to_display": []}
 
 app = Flask(__name__)
 
@@ -84,8 +81,8 @@ def get_random_photo(users):
 def get_all_places():
     global params
     # Set display parameters
-    params['nav_active_main'] = ["active", "", "", "", "", ""]
-    params['title_to_display'] = "All places:"
+    session['nav_main'] = ["active", "", "", "", "", ""]
+    session['title'] = "All places:"
     session['curr_page'] = 1
     params['is_rec'] = False
     # Prepare place_opinion dictionary
@@ -146,7 +143,7 @@ def display_places(page_number):
             'opinion_int': opinion_int
         })
     # Set display parameters
-    params['nav_active_curr'] = params['nav_active_main']
+    session['nav_curr'] = session['nav_main']
     head_imgs = get_photos_of_best_places(1)
     return render_template('places.html', places=places_list, params=params, max_page=max_page, head_imgs=head_imgs, session=session)
 
@@ -186,7 +183,7 @@ def place_details(place_id):
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
     place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "", "", ""]
+    session['nav_curr'] = ["", "", "", "", "", ""]
     return render_template('place.html', place = place_dict2, params = params, session=session)
 
 
@@ -210,7 +207,7 @@ def edit_place_details(place_id):
         places = mongodb.db.myRecPlaces
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "", "", ""]
+    session['nav_curr'] = ["", "", "", "", "", ""]
     return render_template('editplace.html', place=place, params=params, editor=editor, session=session)
 
 
@@ -249,7 +246,7 @@ def update_place(place_id):
 def add_place():
     global params
     # Set display parameters
-    params['nav_active_curr'] = ["", "active", "", "", "", ""]
+    session['nav_curr'] = ["", "active", "", "", "", ""]
     return render_template('addplace.html', params=params, session=session)
 
 
@@ -314,16 +311,16 @@ def search():
     global params
     countries = mongodb.db.countries.find().sort("country_name")
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "active", "", "", ""]
-    return render_template("search.html", params = params, countries = countries, session=session)
+    session['nav_curr'] = ["", "", "active", "", "", ""]
+    return render_template("select.html", params = params, countries = countries, session=session)
 
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
     global params
     # Set display parameters
-    params['nav_active_main'] = ["", "", "", "", "", ""]
-    params['title_to_display'] = "Selected places:"
+    session['nav_main'] = ["", "", "active", "", "", ""]
+    session['title'] = "Selected places:"
     session['curr_page'] = 1
     params['is_rec'] = False
     # Prepare place_opinion dictionary
@@ -339,7 +336,7 @@ def get_selected_places():
 def login(login_problem):
     global params
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "", "active", ""]
+    session['nav_curr'] = ["", "", "", "", "active", ""]
     return render_template("login.html", params = params, login_problem = login_problem, session=session)
 
 
@@ -368,7 +365,7 @@ def logout():
 def sign_up(signup_problem):
     global params
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "", "active", ""]
+    session['nav_curr'] = ["", "", "", "", "active", ""]
     return render_template('signup.html', params=params, signup_problem=signup_problem, session=session)
 
 
@@ -388,7 +385,7 @@ def insert_user():
 def help():
     global params
     # Set display parameters
-    params['nav_active_curr'] = ["", "", "", "", "", "active"]
+    session['nav_curr'] = ["", "", "", "", "", "active"]
     return render_template('help.html', params=params, session=session)
 
 
@@ -458,8 +455,8 @@ def recommend():
             if sum_similarities > 0:
                 recs[place] = round(sum_opinions / sum_similarities, 2)
     # Set display parameters
-    params['nav_active_main'] = ["", "", "", "active", "", ""]
-    params['title_to_display'] = "RECommended places:"
+    session['nav_main'] = ["", "", "", "active", "", ""]
+    session['title'] = "RECommended places:"
     session['curr_page'] = 1
     params['is_rec'] = True
     params['place_opinion'] = recs
