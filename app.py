@@ -8,8 +8,6 @@ if os.path.exists("env.py"):
     import env
 
 
-params = { "place_opinion": {} }
-
 app = Flask(__name__)
 
 app.config["MONGO_DBNAME"] = 'myRecsDB'
@@ -75,28 +73,38 @@ def get_random_photo(users):
     return output_url
 
 
+def read_from_buffer():
+    place_opinion = {}
+    buffer = mongodb.db.buffer.find()
+    for item in buffer:
+        place_opinion[item["id"]] = item["opinion"]
+    return place_opinion
+
+
+
 @app.route('/')
 def get_all_places():
-    global params
+    # Read "_id" and "opinion" for all places, save them in "buffer" collection
+    places = mongodb.db.myRecPlaces.find({}, {'opinion': 1})
+    buff_dict = []
+    for place in places:
+        buff_dict.append({"id": place['_id'], "opinion": place['opinion']})
+    mongodb.db.buffer.delete_many({})
+    mongodb.db.buffer.insert_many(buff_dict)
     # Set display parameters
     session['nav_main'] = ["active", "", "", "", "", ""]
     session['title'] = "All places:"
     session['curr_page'] = 1
     session['is_rec'] = False
-    # Prepare place_opinion dictionary
-    places = mongodb.db.myRecPlaces.find()
-    params['place_opinion'] = {}
-    for place in places:
-        params['place_opinion'][place['_id']] = place['opinion']
+    print("All places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
 @app.route('/display_places/<page_number>')
 def display_places(page_number):
-    global params
     PER_PAGE = 15
-    # Select places to display
-    place_opinion = params['place_opinion']
+    # Read from "buffer" collections pairs id/opinion and save in dictionary
+    place_opinion = read_from_buffer()
     # Calculate the range of documents to display
     total_number_of_places = len(place_opinion)
     max_page = math.ceil(total_number_of_places / PER_PAGE)
@@ -148,7 +156,7 @@ def display_places(page_number):
 
 @app.route('/place_details/<place_id>')
 def place_details(place_id):
-    global params
+    # Main part
     editor = session['logged_in_user'] if 'logged_in_user' in session else None
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     place_dict = {}
@@ -179,10 +187,14 @@ def place_details(place_id):
     if len(place_dict2['photo_urls']) == 0:
         place_dict2['photo_urls'] = ['https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet']
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
-    place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
+    # If the place is RECommended then retrieve REC-opinion
+    if session['is_rec']:
+        place_opinion = read_from_buffer()
+        rec_opinion = place_opinion[ObjectId(place_id)]
+        place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(rec_opinion)
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", ""]
-    return render_template('place.html', place= lace_dict2, session=session)
+    return render_template('place.html', place=place_dict2, session=session)
 
 
 @app.route('/edit_place_details/<place_id>')
@@ -309,18 +321,20 @@ def search():
 
 @app.route('/get_selested_places', methods=["POST"])
 def get_selected_places():
-    global params
+    # Read "_id" and "opinion" for all places, save them in "buffer" collection
+    selected_countries = request.form.getlist('country')
+    places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}}, {'opinion': 1})
+    buff_dict = []
+    for place in places:
+        buff_dict.append({"id": place['_id'], "opinion": place['opinion']})
+    mongodb.db.buffer.delete_many({})
+    mongodb.db.buffer.insert_many(buff_dict)
     # Set display parameters
     session['nav_main'] = ["", "", "active", "", "", ""]
     session['title'] = "Selected places:"
     session['curr_page'] = 1
     session['is_rec'] = False
-    # Prepare place_opinion dictionary
-    selected_countries = request.form.getlist('country')
-    places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}})
-    params['place_opinion'] = {}
-    for place in places:
-        params['place_opinion'][place['_id']] = place['opinion']
+    print("Selected places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
@@ -377,7 +391,6 @@ def help():
 
 @app.route('/recommend')
 def recommend():
-    global params
     # Extract data about all places
     place_list = []
     place_dict = {}
@@ -411,21 +424,21 @@ def recommend():
     similarity = {}
     for username in user_list:
         user_opinions = user_dict[username]
-        coor = []
+        opinions_to_compare = []
         for place in my_opinions:
             if my_opinions[place]['is_visited'] is True:
                 my_opinion = my_opinions[place]['opinion']
                 if place in user_opinions:
                     if user_opinions[place]['is_visited'] is True:
                         user_opinion = user_opinions[place]['opinion']
-                        coor.append({'x': my_opinion, 'y': user_opinion})
-        if len(coor) > 0:
+                        opinions_to_compare.append({'my': my_opinion, 'user': user_opinion})
+        if len(opinions_to_compare) > 0:
             sum_d2 = 0
-            for point in coor:
-                sum_d2 += pow(point['x'] - point['y'], 2)
-            similarity[username] = 1 - pow(sum_d2 / len(coor), 0.5) / 6
-    # Find recommendations
-    recs = {}
+            for opinion_pair in opinions_to_compare:
+                sum_d2 += pow(opinion_pair['my'] - opinion_pair['user'], 2)
+            similarity[username] = 1 - pow(sum_d2 / len(opinions_to_compare), 0.5) / 6
+    # Find recommended places and calculate "REC"-opinion
+    recs = []
     for place in place_list:
         if (place in my_opinions) and (my_opinions[place]['is_visited'] is True):
             continue
@@ -439,13 +452,16 @@ def recommend():
                         sum_opinions += user_opinions[place]['opinion'] * similarity[user]
                         sum_similarities += similarity[user]
             if sum_similarities > 0:
-                recs[place] = round(sum_opinions / sum_similarities, 2)
+                recs.append({"id": place, "opinion": round(sum_opinions / sum_similarities, 2)})
+    mongodb.db.buffer.delete_many({})
+    mongodb.db.buffer.insert_many(recs)
+    print("RECs: ", recs)
     # Set display parameters
     session['nav_main'] = ["", "", "", "active", "", ""]
     session['title'] = "RECommended places:"
     session['curr_page'] = 1
     session['is_rec'] = True
-    params['place_opinion'] = recs
+    print("RECommebded places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
