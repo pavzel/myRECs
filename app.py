@@ -13,7 +13,6 @@ params = {  "place_opinion": {},
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
-            "best_place_images": [],
             "title_to_display": "All places:",
             "per_page": 15,
             "max_page": 1,
@@ -28,15 +27,15 @@ app.secret_key = os.environ.get("SECRET")
 mongodb = PyMongo(app)
 
 
-def get_photos_of_best_places(value, number):
-    best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } })
+def get_photos_of_best_places(value):
+    best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } }).sort("opinion", -1).limit(20)
     best_place_images = []
     for place in best_places:
         place_photo = get_random_photo(place['users'])
-        if not (place_photo is None):
+        if place_photo:
             best_place_images.append(place_photo)
     random.shuffle(best_place_images)
-    return best_place_images[0:number]
+    return best_place_images[0:3]
 
 
 def update_countries(country):
@@ -150,8 +149,8 @@ def display_places(page_number):
         })
     # Set display parameters
     params['nav_active_curr'] = params['nav_active_main']
-    params['best_place_images'] = get_photos_of_best_places(1, 3)
-    return render_template('places.html', places=places_list, params=params, session=session)
+    head_imgs = get_photos_of_best_places(1)
+    return render_template('places.html', places=places_list, params=params, head_imgs=head_imgs, session=session)
 
 
 @app.route('/place_details/<place_id>')
