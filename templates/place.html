@@ -78,7 +78,7 @@
                     {{ place.opinion_str }}
                 {% endif %}
             </p>
-            {% if params['is_rec'] %}
+            {% if session['is_rec'] %}
                 <p class="text-danger">
                     <strong>RECommendation: </strong>
                     {% if place.rec_int > 0 %}

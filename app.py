@@ -8,9 +8,7 @@ if os.path.exists("env.py"):
     import env
 
 
-params = {  "place_opinion": {},
-            "is_rec": False,
-            "countries_to_display": []}
+params = { "place_opinion": {} }
 
 app = Flask(__name__)
 
@@ -84,7 +82,7 @@ def get_all_places():
     session['nav_main'] = ["active", "", "", "", "", ""]
     session['title'] = "All places:"
     session['curr_page'] = 1
-    params['is_rec'] = False
+    session['is_rec'] = False
     # Prepare place_opinion dictionary
     places = mongodb.db.myRecPlaces.find()
     params['place_opinion'] = {}
@@ -129,7 +127,7 @@ def display_places(page_number):
         photo_url = get_random_photo(place['users'])
         if photo_url is None:
             photo_url = 'https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet'
-        if params['is_rec'] is True:
+        if session['is_rec']:
             footer_text = "RECommendation:"
         else:
             footer_text = "Users' opinion:"
@@ -322,7 +320,7 @@ def get_selected_places():
     session['nav_main'] = ["", "", "active", "", "", ""]
     session['title'] = "Selected places:"
     session['curr_page'] = 1
-    params['is_rec'] = False
+    session['is_rec'] = False
     # Prepare place_opinion dictionary
     selected_countries = request.form.getlist('country')
     places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}})
@@ -458,7 +456,7 @@ def recommend():
     session['nav_main'] = ["", "", "", "active", "", ""]
     session['title'] = "RECommended places:"
     session['curr_page'] = 1
-    params['is_rec'] = True
+    session['is_rec'] = True
     params['place_opinion'] = recs
     return redirect(url_for('display_places', page_number=session['curr_page']))
 
