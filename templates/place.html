@@ -123,7 +123,7 @@
                 </ul>
             {% endif %}
             <div class="row justify-content-start">
-                <a class="btn btn-primary btn ml-3" href="{{ url_for('display_places', page_number=params['curr_page']) }}" role="button">Back</a>
+                <a class="btn btn-primary btn ml-3" href="{{ url_for('display_places', page_number=session['curr_page']) }}" role="button">Back</a>
                 {% if place.status == 'anonymous' %}
                     <a class="btn btn-primary btn ml-2" href="{{ url_for('login', login_problem = False) }}" role="button">Edit</a>
                 {% else %}

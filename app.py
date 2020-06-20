@@ -13,8 +13,7 @@ params = {  "place_opinion": {},
             "countries_to_display": [],
             "nav_active_main": ["active", "", "", "", "", ""],
             "nav_active_curr": ["active", "", "", "", "", ""],
-            "title_to_display": "All places:",
-            "curr_page": 1}
+            "title_to_display": "All places:"}
 
 app = Flask(__name__)
 
@@ -87,14 +86,14 @@ def get_all_places():
     # Set display parameters
     params['nav_active_main'] = ["active", "", "", "", "", ""]
     params['title_to_display'] = "All places:"
-    params['curr_page'] = 1
+    session['curr_page'] = 1
     params['is_rec'] = False
     # Prepare place_opinion dictionary
     places = mongodb.db.myRecPlaces.find()
     params['place_opinion'] = {}
     for place in places:
         params['place_opinion'][place['_id']] = place['opinion']
-    return redirect(url_for('display_places', page_number=1))
+    return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
 @app.route('/display_places/<page_number>')
@@ -106,9 +105,9 @@ def display_places(page_number):
     # Calculate the range of documents to display
     total_number_of_places = len(place_opinion)
     max_page = math.ceil(total_number_of_places / PER_PAGE)
-    params["curr_page"] = int(page_number)
-    index_min = PER_PAGE * (params["curr_page"] - 1)
-    index_max = PER_PAGE * params["curr_page"]
+    session["curr_page"] = int(page_number)
+    index_min = PER_PAGE * (session["curr_page"] - 1)
+    index_max = PER_PAGE * session["curr_page"]
     if index_max > total_number_of_places:
         index_max = index_min + total_number_of_places % PER_PAGE
     # Sorting of places according to opinion
@@ -188,7 +187,7 @@ def place_details(place_id):
     place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(params['place_opinion'][ObjectId(place_id)])
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
-    return render_template('placedetails.html', place = place_dict2, params = params, session=session)
+    return render_template('place.html', place = place_dict2, params = params, session=session)
 
 
 @app.route('/edit_place_details/<place_id>')
@@ -212,7 +211,7 @@ def edit_place_details(place_id):
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
     # Set display parameters
     params['nav_active_curr'] = ["", "", "", "", "", ""]
-    return render_template('editplacedetails.html', place=place, params=params, editor=editor, session=session)
+    return render_template('editplace.html', place=place, params=params, editor=editor, session=session)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
@@ -243,7 +242,7 @@ def update_place(place_id):
     place_modified['country'] = country
     place_modified['opinion'] = calculate_users_opinion(users)
     places.update_one({"_id": ObjectId(place_id)}, {"$set": place_modified})
-    return redirect(url_for('display_places', page_number=params["curr_page"]))
+    return redirect(url_for('display_places', page_number=session["curr_page"]))
 
 
 @app.route('/add_place')
@@ -325,7 +324,7 @@ def get_selected_places():
     # Set display parameters
     params['nav_active_main'] = ["", "", "", "", "", ""]
     params['title_to_display'] = "Selected places:"
-    params['curr_page'] = 1
+    session['curr_page'] = 1
     params['is_rec'] = False
     # Prepare place_opinion dictionary
     selected_countries = request.form.getlist('country')
@@ -333,7 +332,7 @@ def get_selected_places():
     params['place_opinion'] = {}
     for place in places:
         params['place_opinion'][place['_id']] = place['opinion']
-    return redirect(url_for('display_places', page_number=1))
+    return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
 @app.route('/login/<login_problem>')
@@ -382,7 +381,7 @@ def insert_user():
     if users.count_documents({'username': username}) == 0 and username != '':
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem = False))
-    return render_template("signup.html", params = params, signup_problem = True, session=session)
+    return render_template('signup.html', params = params, signup_problem = True, session=session)
 
 
 @app.route('/help')
@@ -461,10 +460,10 @@ def recommend():
     # Set display parameters
     params['nav_active_main'] = ["", "", "", "active", "", ""]
     params['title_to_display'] = "RECommended places:"
-    params['curr_page'] = 1
+    session['curr_page'] = 1
     params['is_rec'] = True
     params['place_opinion'] = recs
-    return redirect(url_for('display_places', page_number=1))
+    return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
 if __name__ == '__main__':
