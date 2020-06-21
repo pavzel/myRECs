@@ -162,14 +162,16 @@ def display_many_places(page_number):
                             session=session)
 
 
-@app.route('/place_details/<place_id>')
-def place_details(place_id):
-    # Main part
+@app.route('/place/<place_id>')
+def display_place(place_id):
     editor = session['logged_in_user'] if 'logged_in_user' in session else None
+    # Get data about a place
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
+    # Save data in a dictionary
     place_dict = {}
     for key in place:
         place_dict[key] = place[key]
+    # Compose a dictionary with data for display
     place_dict2 = {}
     place_dict2['_id'] = place_dict['_id']
     if editor:
@@ -181,6 +183,7 @@ def place_details(place_id):
     if place_dict2['status'] == 'contributor':
         place_dict2['my_opinion'] = int(place_dict['users'][editor]['my_opinion'])
         place_dict2['is_visited'] = place_dict['users'][editor]['is_visited']
+    # Collect photos, websites and comment added by all users
     place_dict2['photo_urls'] = []
     place_dict2['websites'] = []
     place_dict2['comments'] = []
@@ -192,8 +195,10 @@ def place_details(place_id):
             place_dict2['websites'].append(users[user]['website'])
         if users[user]['comment'] != '':
             place_dict2['comments'].append(users[user]['comment'])
+    # If there is no photo yet, add a placeholder
     if len(place_dict2['photo_urls']) == 0:
         place_dict2['photo_urls'] = ['https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet']
+    # Add users' opinion
     place_dict2['opinion_str'], place_dict2['opinion_int'] = get_users_opinion(users)
     # If the place is RECommended then add REC-opinion to "place" dictionary
     if session['is_rec']:
@@ -205,13 +210,14 @@ def place_details(place_id):
     return render_template('place.html', place=place_dict2, session=session)
 
 
-@app.route('/edit_place_details/<place_id>')
-def edit_place_details(place_id):
+@app.route('/edit_place/<place_id>')
+def edit_place(place_id):
     if 'logged_in_user' in session:
         editor = session['logged_in_user']
     else:
-        editor = ''
+        return redirect(url_for('login', login_problem=False))
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
+    # If no data were added by the user before then add basic data now
     if not (editor in place['users']):
         new_user = {}
         new_user['my_opinion'] = int(0)

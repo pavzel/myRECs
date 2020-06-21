@@ -44,20 +44,20 @@
             {% for place in places %}
                 <div class="col mb-3">
                     <div class="card shadow-sm">
-                        <a href="{{ url_for('place_details', place_id=place._id) }}">
+                        <a href="{{ url_for('display_place', place_id=place._id) }}">
                             <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid">
                         </a>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-8">
                                     <h5 class="card-title">
-                                        <a href="{{ url_for('place_details', place_id=place._id) }}">{{ place.place_name }}</a>
+                                        <a href="{{ url_for('display_place', place_id=place._id) }}">{{ place.place_name }}</a>
                                     </h5>
                                 </div>
                                 <div class="col-4">
                                     <div class="row justify-content-end">
                                         <a class="btn btn-primary btn-sm mr-2"
-                                            href="{{ url_for('place_details', place_id=place._id) }}" role="button">
+                                            href="{{ url_for('display_place', place_id=place._id) }}" role="button">
                                             Details
                                         </a>
                                     </div>
