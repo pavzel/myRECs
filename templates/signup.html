@@ -18,17 +18,17 @@
                     <div class="col">
                         <div class="form-group">
                             <label for="username"><strong>username: </strong></label>
-                            <input id="username" type="text" name="username" class="form-control" placeholder="Enter your username">
+                            <input id="username" type="text" name="username" class="form-control" placeholder="Enter your username" required>
                         </div>
                         <div class="form-group">
                             <label for="password"><strong>password: </strong></label>
-                            <input id="password" type="text" name="password" class="form-control" placeholder="Enter your password">
+                            <input id="password" type="text" name="password" class="form-control" placeholder="Enter your password" required>
                         </div>
                     </div>
                 </div>
                 <div class="row mb-1 justify-content-start">
                     <button class="btn btn-primary ml-3" type="submit" name="action">Sign Up</button>
-                    <a class="btn btn-primary ml-2" href="{{ url_for('login', login_problem = False) }}">Cancel</a>
+                    <a class="btn btn-primary ml-2" href="{{ url_for('login', login_problem=False) }}">Cancel</a>
                 </div>
             </form>
         </div>

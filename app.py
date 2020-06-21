@@ -99,7 +99,6 @@ def get_all_places():
     session['title'] = "All places:"
     session['curr_page'] = 1
     session['is_rec'] = False
-    print("All places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
 
 
@@ -266,14 +265,15 @@ def insert_place():
         editor = session['logged_in_user']
     else:
         return redirect(url_for('login', login_problem=False))
-    places = mongodb.db.myRecPlaces
+    # Get data from form and prepare for saving
     country = request.form.get('country')
-    if country == '':
-        country = 'not sure'
-    update_countries(country)
     opinion = float(request.form.get('my_opinion'))
     my_opinion = int(opinion)
     is_visited = bool(request.form.get('is_visited'))
+    # Update "countries" collection if necessary
+    update_countries(country)
+    # Add a record to "myRecPlaces" collection
+    places = mongodb.db.myRecPlaces
     places.insert_one({
         'place_name': request.form.get('place_name'),
         'country': country,
@@ -302,8 +302,10 @@ def delete_place(place_id):
     #Delete user's record about the place
     place = places.find_one({"_id": ObjectId(place_id)})
     if editor == place['added_by']:
+        # Delete the record form collection completely
         places.remove({'_id': ObjectId(place_id)})
     else:
+        # Delete only those data about the place that were added by logged in user
         users = place['users']
         users.pop(editor)
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
@@ -314,8 +316,8 @@ def delete_place(place_id):
     return redirect(url_for('get_all_places'))
 
 
-@app.route('/search')
-def search():
+@app.route('/select')
+def select():
     countries = mongodb.db.countries.find().sort("country_name")
     # Set display parameters
     session['nav_curr'] = ["", "", "active", "", "", ""]
@@ -333,59 +335,7 @@ def get_selected_places():
     session['title'] = "Selected places:"
     session['curr_page'] = 1
     session['is_rec'] = False
-    print("Selected places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
-
-
-@app.route('/login/<login_problem>')
-def login(login_problem):
-    # Set display parameters
-    session['nav_curr'] = ["", "", "", "", "active", ""]
-    return render_template("login.html", login_problem=login_problem, session=session)
-
-
-@app.route('/sign_in', methods=["POST"])
-def sign_in():
-    users = mongodb.db.users
-    username = request.form.get('username')
-    password = request.form.get('password')
-    if users.count_documents({'username': username}) == 1:
-        user = users.find_one({'username': username})
-        if user['password'] == password:
-            session['logged_in_user'] = username
-            return redirect(url_for('get_all_places'))
-    return render_template("login.html", login_problem = True, session=session)
-
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in_user', None)
-    return redirect(url_for('get_all_places'))
-
-
-@app.route('/sign_up/<signup_problem>')
-def sign_up(signup_problem):
-    # Set display parameters
-    session['nav_curr'] = ["", "", "", "", "active", ""]
-    return render_template('signup.html', signup_problem=signup_problem, session=session)
-
-
-@app.route('/insert_user', methods=["POST"])
-def insert_user():
-    users = mongodb.db.users
-    username = request.form.get('username')
-    password = request.form.get('password')
-    if users.count_documents({'username': username}) == 0 and username != '':
-        users.insert_one({'username': username, 'password': password})
-        return redirect(url_for('login', login_problem = False))
-    return render_template('signup.html', signup_problem = True, session=session)
-
-
-@app.route('/help')
-def help():
-    # Set display parameters
-    session['nav_curr'] = ["", "", "", "", "", "active"]
-    return render_template('help.html', session=session)
 
 
 @app.route('/recommend')
@@ -454,14 +404,68 @@ def recommend():
                 recs.append({"id": place, "opinion": round(sum_opinions / sum_similarities, 2)})
     mongodb.db.buffer.delete_many({})
     mongodb.db.buffer.insert_many(recs)
-    print("RECs: ", recs)
     # Set display parameters
     session['nav_main'] = ["", "", "", "active", "", ""]
     session['title'] = "RECommended places:"
     session['curr_page'] = 1
     session['is_rec'] = True
-    print("RECommebded places: is_rec: ", session['is_rec'])
     return redirect(url_for('display_places', page_number=session['curr_page']))
+
+
+@app.route('/login/<login_problem>')
+def login(login_problem):
+    # Set display parameters
+    session['nav_curr'] = ["", "", "", "", "active", ""]
+    return render_template("login.html", login_problem=login_problem, session=session)
+
+
+@app.route('/sign_in', methods=["POST"])
+def sign_in():
+    # Get login data from form
+    username = request.form.get('username')
+    password = request.form.get('password')
+    # Check username and password and sign in
+    users = mongodb.db.users
+    if users.count_documents({'username': username}) == 1:
+        user = users.find_one({'username': username})
+        if user['password'] == password:
+            session['logged_in_user'] = username
+            return redirect(url_for('get_all_places'))
+    # Inform about problems with sign in and try again
+    return render_template("login.html", login_problem = True, session=session)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in_user', None)
+    return redirect(url_for('get_all_places'))
+
+
+@app.route('/sign_up/<signup_problem>')
+def sign_up(signup_problem):
+    # Set display parameters
+    session['nav_curr'] = ["", "", "", "", "active", ""]
+    return render_template('signup.html', signup_problem=signup_problem, session=session)
+
+
+@app.route('/insert_user', methods=["POST"])
+def insert_user():
+    # Get user's data from form
+    username = request.form.get('username')
+    password = request.form.get('password')
+    # Add user's data to "users" collection
+    users = mongodb.db.users
+    if users.count_documents({'username': username}) == 0:
+        users.insert_one({'username': username, 'password': password})
+        return redirect(url_for('login', login_problem = False))
+    return render_template('signup.html', signup_problem = True, session=session)
+
+
+@app.route('/help')
+def help():
+    # Set display parameters
+    session['nav_curr'] = ["", "", "", "", "", "active"]
+    return render_template('help.html')
 
 
 if __name__ == '__main__':
