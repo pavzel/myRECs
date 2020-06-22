@@ -92,6 +92,66 @@ def write_to_buffer(places):
     mongodb.db.buffer.insert_many(buff_dict)
 
 
+def remove_from_buffer(id):
+    mongodb.db.buffer.delete_one({'id': ObjectId(id)})
+
+
+# Calculate parameters for pagination
+def get_page_params(place_opinion, page_number):
+    PER_PAGE = 15
+    total_number_of_places = len(place_opinion)
+    max_page = math.ceil(total_number_of_places / PER_PAGE)
+    curr_page = max_page if int(page_number) > max_page else int(page_number)
+    index_min = PER_PAGE * (curr_page - 1)
+    index_max = PER_PAGE * curr_page
+    if index_max > total_number_of_places:
+        index_max = index_min + total_number_of_places % PER_PAGE
+    return curr_page, max_page, index_min, index_max
+
+
+#For places to display, prepare list of IDs "id_list"
+def get_id_list(place_opinion, index_min, index_max):
+    # Sort places according to opinion
+    list_for_sorting = []
+    for place in place_opinion:
+        list_for_sorting.append((place, place_opinion[place]))
+    list_sorted = sorted(list_for_sorting, key=lambda tuple: tuple[1], reverse=True)
+    # Select places with indexes between index_min, index_max in the sorted list
+    id_list = []
+    for index in range(index_min, index_max):
+        id_list.append(list_sorted[index][0])
+    return id_list
+
+
+# For places to display save their data in a dictionary "places_dict"
+def get_places_dict(id_list):
+    places = mongodb.db.myRecPlaces.find({"_id": { "$in": id_list } })
+    places_dict = {}
+    for place in places:
+        places_dict[place['_id']] = place
+    return places_dict
+
+
+# For the selected places, prepare a list with data essential for display
+def get_display_list(id_list, places_dict, place_opinion, is_rec):
+    display_list = []
+    for id in id_list:
+        place = places_dict[id]
+        photo_url = get_random_photo(place['users'])
+        if photo_url is None:
+            photo_url = 'https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet'
+        opinion_str, opinion_int = float_to_str_int(place_opinion[id])
+        display_list.append({
+            '_id': place['_id'],
+            'photo_url': photo_url,
+            'place_name': place['place_name'],
+            'footer_text': "REC-opinion:" if is_rec else "Users' opinion:",
+            'opinion_str': opinion_str,
+            'opinion_int': opinion_int
+        })
+    return display_list
+
+
 @app.route('/')
 def get_all_places():
     # Read "_id" and "opinion" for all places, save them in "buffer" collection
@@ -107,52 +167,16 @@ def get_all_places():
 
 @app.route('/places/<page_number>')
 def display_many_places(page_number):
-    PER_PAGE = 15
     # Read from "buffer" collections pairs id/opinion and save in dictionary
     place_opinion = read_from_buffer()
-    # Sort places according to opinion
-    list_for_sorting = []
-    for place in place_opinion:
-        list_for_sorting.append((place, place_opinion[place]))
-    list_sorted = sorted(list_for_sorting, key=lambda tuple: tuple[1], reverse=True)
-    # Calculate the range of documents to display
-    total_number_of_places = len(place_opinion)
-    max_page = math.ceil(total_number_of_places / PER_PAGE)
-    session["curr_page"] = int(page_number)
-    index_min = PER_PAGE * (session["curr_page"] - 1)
-    index_max = PER_PAGE * session["curr_page"]
-    if index_max > total_number_of_places:
-        index_max = index_min + total_number_of_places % PER_PAGE
-    # Out of the sorted list choose only those places that must be displayed on the current page
-    place_list = []
-    for index in range(index_min, index_max):
-        place_list.append(list_sorted[index][0])
-    # Get data places that must be displayed and save them in a dictionary 
-    places = mongodb.db.myRecPlaces.find({"_id": { "$in": place_list } })
-    places_dict = {}
-    for place in places:
-        places_dict[place['_id']] = place
+    # Calculate parameters for pagination
+    session["curr_page"], max_page, index_min, index_max = get_page_params(place_opinion, page_number)
+    # For places to display, prepare list of IDs "id_list"
+    id_list = get_id_list(place_opinion, index_min, index_max)
+    # For places to display save their data in a dictionary "places_dict"
+    places_dict = get_places_dict(id_list)
     # For the selected places, prepare a list with data essential for display
-    display_list = []
-    for place_id in place_list:
-        place = places_dict[place_id]
-        place_name = place['place_name']
-        photo_url = get_random_photo(place['users'])
-        if photo_url is None:
-            photo_url = 'https://via.placeholder.com/700x400/0000FF/FFFFFF/?text=No+photo+yet'
-        if session['is_rec']:
-            footer_text = "REC-opinion:"
-        else:
-            footer_text = "Users' opinion:"
-        opinion_str, opinion_int = float_to_str_int(place_opinion[place_id])
-        display_list.append({
-            '_id': place['_id'],
-            'photo_url': photo_url,
-            'place_name': place_name,
-            'footer_text': footer_text,
-            'opinion_str': opinion_str,
-            'opinion_int': opinion_int
-        })
+    display_list = get_display_list(id_list, places_dict, place_opinion, session['is_rec'])
     # Set display parameters
     session['nav_curr'] = session['nav_main']
     return render_template('places.html',
@@ -219,6 +243,7 @@ def edit_place(place_id):
     place = mongodb.db.myRecPlaces.find_one({"_id": ObjectId(place_id)})
     # If no data were added by the user before then add basic data now
     if not (editor in place['users']):
+        is_new = True
         new_user = {}
         new_user['my_opinion'] = int(0)
         new_user['is_visited'] = bool(False)
@@ -229,9 +254,11 @@ def edit_place(place_id):
         users[editor] = new_user
         places = mongodb.db.myRecPlaces
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'users': users}})
+    else:
+        is_new = False
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", ""]
-    return render_template('editplace.html', place=place, editor=editor, session=session)
+    return render_template('editplace.html', place=place, editor=editor, is_new=is_new, session=session)
 
 
 @app.route('/update_place/<place_id>', methods=["POST"])
@@ -317,7 +344,8 @@ def delete_place(place_id):
     place = places.find_one({"_id": ObjectId(place_id)})
     if editor == place['added_by']:
         # Delete the record form collection completely
-        places.remove({'_id': ObjectId(place_id)})
+        places.delete_one({'_id': ObjectId(place_id)})
+        remove_from_buffer(place_id)
     else:
         # Delete only those data about the place that were added by logged in user
         users = place['users']
@@ -327,7 +355,9 @@ def delete_place(place_id):
         place = places.find_one({"_id": ObjectId(place_id)})
         opinion = calculate_users_opinion(place['users'])
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
-    return redirect(url_for('get_all_places'))
+        mongodb.db.buffer.update_one({"id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
+    #return redirect(url_for('get_all_places'))
+    return redirect(url_for('display_many_places', page_number=session['curr_page']))
 
 
 @app.route('/select')
