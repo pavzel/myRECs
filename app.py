@@ -385,6 +385,10 @@ def get_selected_places():
 
 @app.route('/recommend')
 def recommend():
+    if 'logged_in_user' in session:
+        editor = session['logged_in_user']
+    else:
+        return redirect(url_for('login', login_problem=False))
     # Get data added by individual users about all places
     # and save them to a dictionary "place_dict"
     place_dict = {}
@@ -408,8 +412,8 @@ def recommend():
                     'opinion': user_in_place['my_opinion']
                 }
     # Separate data of the logged in user from the other users' data
-    my_opinions = user_dict[session['logged_in_user']]
-    user_dict.pop(session['logged_in_user'])
+    my_opinions = user_dict[editor]
+    user_dict.pop(editor)
     # Calculate similarities
     similarity = {}
     for user in user_dict:
@@ -510,7 +514,7 @@ def insert_user():
 def help():
     # Set display parameters
     session['nav_curr'] = ["", "", "", "", "", "active"]
-    return render_template('help.html')
+    return render_template('help.html', session=session)
 
 
 if __name__ == '__main__':
