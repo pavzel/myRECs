@@ -13,13 +13,13 @@ html {
     column-count: 1;
 }
 
-@media (min-width: 767.98px) {
+@media (min-width: 981px) {
     .card-columns {
         column-count: 2;
     }
 }
 
-@media (min-width: 1199.98px) {
+@media (min-width: 1200px) {
     .card-columns {
         column-count: 3;
     }
