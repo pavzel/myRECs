@@ -31,7 +31,71 @@ A user can see own opinion ("my opinion"; if there is any) and "Users' opinion" 
 
 
 ## UX
-(TO BE ADDED)
+Use this section to provide insight into your UX process, focusing on who this website is for, what it is that they want to achieve and how your project is the best way to help them achieve these things.
+
+In particular, as part of this section we recommend that you provide a list of User Stories, with the following general structure:
+
+As a user type, I want to perform an action, so that I can achieve a goal.
+
+
+## UX
+At the moment, the site was supposed to be used by me, my friends, and maybe friends of friends. That is why its design is minimal and includes only essential feratures.
+### User stories:
+#### Always visible "Navigation menu"
+* As a user, I want to click an always visible Home button, so that I can come back to the landing page with all places saved in the database accessible.
+* As a user, I want to click an always visible Add place button, so that I can add a new place to the database.
+* As a user, I want to be redirected to Login page if I click Add place button before I logged in, so that I can log in.
+* As a user, I want to click an always visible Select button, so that I can select countries of interest.
+* As a user, I want to click an always visible RECommend button, so that I can get personalized recommendations about the places that I haven't visited yet.
+* As a user, I want to be redirected to Login page if I click RECommend button before I logged in, so that I can log in.
+* As a user, I want to click an always visible Login button, so that I can log in. After successful logging in, this button must turn into Logout button with my username indicated.
+* As a user, when I'm logged in I want to click an always visible Logout button, so that I can logged out. After successful logging out, this button must turn into Login button.
+* As a user, I want to click an always visible Help button, so that I can get help.
+#### Image carousel on the main page
+* As a user, I want to see a carousel with several randomly chosen images of places with high rating, so that I can get some impression what exists in the database.
+#### Place cards on the main page
+* As a user, for each individual place card, I want to click Details button, or the place photo, or the place name, so that I can view information about this place added by all users.
+#### Pagination buttons on the main page bottom
+* As a user, I want to see my current page number, so that I know where I am.
+* As a user, I want to see the last page number, so that I know how many pages this set of places includes.
+* As a user, if I'm not on the first page, I want to click an always visible First button, so that I get to the first page.
+* As a user, if I'm not on the first page, I want to click an always visible Previous button, so that I get to the previous page (a page with the current number decreased by 1).
+* As a user, if I'm not on the last page, I want to click an always visible Next button, so that I get to the next page (a page with the current number increased by 1).
+* As a user, if I'm not on the last page, I want to click an always visible Last button, so that I get to the last page.
+#### Place details page
+* As a user, I want to view information about the place added by all users, so that I can refresh my memories about the place or/and find out something new about it.
+* As a user, I want to click Back button, so that I can return to the view with many place cards displayed from where I came to Place details.
+* As a user, I want to click Edit button, so that I can get access to editing information about the place (if I added it before) or to add it (if I saved nothing previously).
+* As a user, I want to be redirected to Login page if I click Edit button before I logged in, so that I can log in.
+#### Editing of place details page
+* As a user, I want to view and change information about the place, so that I can save it.
+* As a user, I want to click Update button, so that my changed information is saved and I can return to the page with many place cards from where I came.
+* As a user, I want to click Cancel button, so that I can discard all changes and return to the page with many place cards from where I came.
+* As a user, I want to click Delete button, so that I can delete all information about the place added by me and return to the page with many place cards from where I came.
+#### Adding a new place page
+* As a user, I want to add information about the place, so that I can save it.
+* As a user, I want to click Add New Place button, so that my information is saved and I can return to the page with many place cards from where I came.
+* As a user, I want to click Cancel button, so that I can discard all information and return to the page with many place cards from where I came.
+#### Selecting places page
+* As a user, I want to select one or several countries from a list of all countries, so that I can view only places from those countries.
+* As a user, I want to click Find Places button, so that I can return to the view with place cards from the selected countries displayed.
+* As a user, I want to click Cancel button, so that I can discard my selection and return to the page with many place cards from where I came.
+#### Recommended places page
+* As a user, I want to see REC-opinion on place cards, so that I know a personalized estimate of my opinion about places that I haven't visited yet.
+#### Place details page navigated from Recommended places page
+* As a user, besides the standard place information, I want to see REC-opinion, so that I know a personalized estimate of my opinion the place that I haven't visited yet.
+#### Login page
+* As a user, I want to enter my username and password, so that I can login.
+* As a user, I want to click Login button, so that my credentials are controlled I can get to Home page.
+* As a user, if there is any problem with login I want to get a warning message and return to Login page, so that I can retry logging in.
+* As a user, I want to click Cancel button, so that log in is cancelled and I can get to the page I came from.
+* As a user, I want to click Sign Up button, so that I can get to Signup page.
+#### Signup page
+* As a user, I want to enter my new username and password, so that I can login in the future.
+* As a user, I want to click Sign Up button, so that my credentials are controlled, saved, and I can get to Login page.
+* As a user, if there is any problem with sign-up I want to get a warning message and return to Sign Up page, so that I can retry signing up.
+* As a user, I want to click Cancel button, so that log in is cancelled and I can get to the page I came from.
+
 
 ## Features
 ### Existing Features
@@ -130,7 +194,7 @@ or redirected from Signup page in case of problems with signing in)
 
 
 ### Features Left to Implement:
-###### At the moment, a minimal usable version of the site is deployed. If there are many enough users interested in the site, many aspects can be imporved, for example:
+**At the moment, a minimal usable version of the site is deployed. If there are many enough users interested in the site, many aspects can be imporved, for example:**
 1. For each place several names can be used (e.g. names in different languages). When a user wants to add a new place the place's name is compared with place names in the database and one or several names (like Syracuse in Italy, Syracuse in NY, Syracuse in IN, etc.) of already saved places are prompted.
 2. Each user can add unlimited number of photos, website links and comments.
 3. For each place, its geographic coordinates and position on map can be added.
@@ -138,7 +202,7 @@ or redirected from Signup page in case of problems with signing in)
 5. Parameters other than country name (e.g. parts of place name, range of Users' opinion, number of users who visited the place etc.) can be used for filtering place sets.
 6. Standard sign up and log in (with email address) can be implemented so that a user can change her/his username, password, get new password to replace the forgotten one etc.\
 
-###### Also the site's functionality can be expanded:
+**Also the site's functionality can be expanded:**
 1. A trip planner can be added. A user sets departure and arrival places, total number of trip days, minimal and maximal distances for a day trip, etc. Based on these data, the site recommends possible routes with places to visit and estimates of time to spend for the visits.
 2. Other services (like sites of travel agencies, hotels or museums) can be added to such a planner.
 
@@ -149,6 +213,10 @@ The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.\
 
 
 ## Testing
+The site was tested manually according to User stories (see UX section above).\
+The site behaved as expected (as described in User stories) when entered information was valid. If the required information was missing (e.g. username and/or password on Signup page), a warning message appeared and the site waited for valid input.\
+An attempt to sign up with an already used username resulted in a warning message and return to the sign up form. Similarly, an attempt to log in with erroneous username and/or password resulted in a warning message and return to the log in form.\
+An attempt to use edit/add/recommended functionality without logging in resulted in redirect to Login page.\
 
 The site was designed to be used mainly on mobile phones with a small display.\
 It was tested on a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px) and a mobile phone Motorola XT1941 4.
