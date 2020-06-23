@@ -29,15 +29,14 @@
                 <li>Your comments about the place (optional)</li>
             </ul>
             <p>Your opinion may be positive but it may as well be negative. Thus the opinion scale looks like this:</p>
-            <ul>
-                <li>-3 means "never go there"</li>
-                <li>-2 means "uninteresting and unfriendly"</li>
-                <li>-1 means "boring"</li>
-                <li>&ensp;0 means "rather nice but nothing special"</li>
-                <li>+1 means "interesting or especially nice"</li>
-                <li>+2 means "very interesting"</li>
-                <li>+3 means "outstanding/unique"</li>
-            </ul>
+            <div class="row"><div class="col-1 px-0 text-right">-3</div><div class="col-10 pl-4">"never go there"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">-2</div><div class="col-10 pl-4">"uninteresting and unfriendly"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">-1</div><div class="col-10 pl-4">"boring"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">0</div><div class="col-10 pl-4">"rather nice but nothing special"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">+1</div><div class="col-10 pl-4">"interesting or especially nice"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">+2</div><div class="col-10 pl-4">"very interesting"</div></div>
+            <div class="row"><div class="col-1 px-0 text-right">+3</div><div class="col-10 pl-4">"outstanding/unique"</div></div>
+            <br>
             <p>Thus the other users may get your RECommendation to visit or not to visit a place.</p>
             <p>You can also delete a place that you added. However, it is <strong>irreversible</strong>! Please, think twice before doing this.</p>
             <p><strong>Important!</strong> To be able to add, edit, or delete place information you have to <a href="{{ url_for('login', login_problem = False) }}">log in</a>. If you have no username yet, please, <a href="{{ url_for('sign_up', signup_problem=False) }}">sign up</a>. No personal information is required. The site is supposed to be as anonymous as it's possible. At the moment, you don't need to provide even your email address.</p>
@@ -60,8 +59,17 @@
     </div>
     <div class="row my-3">
         <div class="col">
-            <h2>How to see, edit, and delete information about a place?</h2>
-            <p></p>
+            <h2>How to view, edit, and delete information about a place?</h2>
+            <p>To view all saved information about a place click <strong>Details</strong> on a place card.</p>
+            <p>Then you can either return to the main view by clicking <strong>Back</strong> or go to editing page by clicking <strong>Edit</strong>.</p>
+            <p>On the editing page after making changes you can either save them by clicking <strong>Update</strong>, or discard them by clicking <strong>Cancel</strong>, or delete all information about the place that you've ever added by clicking <strong>Delete this place (no recover!!!)</strong>.</p>
+            <p><strong>Important!</strong> To be able to add, edit, or delete place information you have to <a href="{{ url_for('login', login_problem = False) }}">log in</a>. Viewing the place information doesn't require logging in.</p>
+        </div>
+    </div>
+    <div class="row my-3">
+        <div class="col">
+            <h2>Questions, suggestions, technical issues?</h2>
+            <p>Please, contact the author of this site: <em><address>pavel.v.zelenin@gmail.com</address></em></p>
         </div>
     </div>
 </div>

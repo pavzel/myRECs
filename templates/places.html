@@ -33,17 +33,16 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-4">
         <div class="col">
             <h1>{{ session['title'] }}</h1>
         </div>
     </div>
 
-    <div class="row mb-3">
+    <div class="row mb-3" id="special">
         <div class="card-columns">
             {% for place in places %}
-                <div class="col mb-3">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm mb-4">
                         <a href="{{ url_for('display_place', place_id=place._id) }}">
                             <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid">
                         </a>
@@ -81,7 +80,6 @@
                             </p>
                         </div>
                     </div>
-                </div>
             {% endfor %}
         </div>
     </div>
