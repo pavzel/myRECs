@@ -4,9 +4,9 @@
 ## Milestone Project #3
 ### (Practical Python and Data-Centric Development)
  
-# Recommendation site myRecs
+# Recommendation site myRECs
 
-https://myRecs.herokuapp.com/
+https://my-recs.herokuapp.com/
 
 
 ## Overview
@@ -19,14 +19,14 @@ All recommendations are place-centered. A place can have just one interesting si
 
 For each place the following information is saved: name, country, personal opinion ("rating", details see below), a marker (visited or not visited), a link to a photo (optional), a link to a website (optional).
 
-A place is rated by a user according to a scale:
-    -3 means "never go there"
-    -2 means "uninteresting and unfriendly"
-    -1 means "boring"
-     0 means "rather nice but nothing special"
-    +1 means "interesting or especially nice"
-    +2 means "very interesting"
-    +3 means "outstanding/unique"
+A place is rated by a user according to a scale:\
+    -3 means "never go there"\
+    -2 means "uninteresting and unfriendly"\
+    -1 means "boring"\
+     0 means "rather nice but nothing special"\
+    +1 means "interesting or especially nice"\
+    +2 means "very interesting"\
+    +3 means "outstanding/unique"\
 A user can see own opinion ("my opinion"; if there is any) and "Users' opinion" based on opinions of all users. Potentially, a custom "REC -opinion" based on similarity of tastes of a user with the other users, can be calculated for places not yet visited by the user.
 
 
@@ -39,14 +39,14 @@ The site includes pages: Home, Place details, Editing of place details, Adding a
 Most of them are directly accessible via a menu. The menu is present on top of all pages, as well as a footer on bottom of all pages.
 Besides these standard top menu and bottom footer different pages contain the following.
 
-####Home page
+#### Home page
 (accessible by clicking "Home" in menu or "myRECs" logo in the top left corner):
 1. A carousel with 3 images randomly chosen from all images saved for places with "Users' opinion" higher than +1.
 2. A page title "All places:".
 3. Cards for not more than 15 places. Each card displays (i) a random image saved for the place, (ii) name of the place, (iii) "Details" button than leads to Place details page for the place, (iv) "Users' opinion".
 4. Pagination buttons for access to all places if number of places in the set is greater than 15. "First" button brings directly to the first page. "Last" button displays the last page number and brings directly to the last page. Middle "button" just indicates the current page number. "Previous" reduces the current page number by 1. "Next" increases the current page number by 1. A button is active only if clicking it can change the current page (e.g. if the current page is the last one then "Next" and "Last" buttons are inactive).
 
-####Place details
+#### Place details
 (accessible by clicking "Details" button, or place photo, or place name on a place card):
 1. A carousel with all images saved by all users for the place.
 2. The place name.
@@ -58,7 +58,7 @@ Besides these standard top menu and bottom footer different pages contain the fo
 8. A list (if not empty) of comments about the place added by all users.
 
 
-####Help page
+#### Help page
 (accessible by clicking "Help" in menu):
 1. basic concepts of the site,
 2. instructions for users,
@@ -79,25 +79,25 @@ Also the site's functionality can be expanded:
 
 
 ## Technologies Used
-The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.\
+The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB. \
 [Bootstrap] toolkit (https://getbootstrap.com/) was used for simple and clear design.
 
 
 ## Testing
-The site was designed to be used mainly on mobile phones with a small display.\
+The site was designed to be used mainly on mobile phones with a small display. \
 It was tested on a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px) and a mobile phone Motorola XT1941 4.
 
 
 ## Deployment
-The project is deployed to Heroku (built from the master branch):\
+The project is deployed to Heroku (built from the master branch): \
 https://myRecs.herokuapp.com/ \
 The source files are publicly accessible:\
-https://github.com/pavzel/myRecs\
+https://github.com/pavzel/myRecs \
 To run locally, you can clone this repository: paste `git clone https://github.com/pavzel/myRecs.git` into your terminal. To cut ties with this GitHub repository, type `git remote rm origin` into the terminal.
 Private configuration variables (the link MONGO_URI that gives access to the MongoDB database, and the secret key SECRET used by Flask app) are not revealed.
 
 
 ## Credits
-The photos saved in the database for this project are only from open sources like Wikipedia etc.
-The links saved in the database for this project are to open resources like Wikipedia, museum sites etc.
-The project idea was suggested by Code Institute.\
+The photos saved in the database for this project are only from open sources like Wikipedia etc. \
+The links saved in the database for this project are to open resources like Wikipedia, museum sites etc. \
+The project idea was suggested by Code Institute. \
