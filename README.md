@@ -35,19 +35,19 @@ A user can see own opinion ("my opinion"; if there is any) and "Users' opinion" 
 
 ## Features
 ### Existing Features
-The site includes pages: Home, Place details, Editing of place details, Adding a new place, Selecting places, Recommended places, Login, and Help.\
-Most of them are directly accessible via a menu. The menu is present on top of all pages, as well as a footer on bottom of all pages.
-Besides these standard top menu and bottom footer different pages contain the following.
+The site includes pages: Home, Place details, Editing of place details, Adding a new place, Selecting places, Selected places, Recommended places, Login, Signup and Help.\
+Most of these pages are directly accessible via a menu. The menu is present on top of all pages, as well as a footer on bottom of all pages.
+Besides these standard top menu and bottom footer, different pages contain the following.
 
-#### Home page
-(accessible by clicking "Home" in menu or "myRECs" logo in the top left corner):
+#### Home
+(accessible by clicking "Home" in menu or "myRECs" logo in the top left corner)
 1. A carousel with 3 images randomly chosen from all images saved for places with "Users' opinion" higher than +1.
-2. A page title "All places:".
+2. The page title "All places".
 3. Cards for not more than 15 places. Each card displays (i) a random image saved for the place, (ii) name of the place, (iii) "Details" button than leads to Place details page for the place, (iv) "Users' opinion".
 4. Pagination buttons for access to all places if number of places in the set is greater than 15. "First" button brings directly to the first page. "Last" button displays the last page number and brings directly to the last page. Middle "button" just indicates the current page number. "Previous" reduces the current page number by 1. "Next" increases the current page number by 1. A button is active only if clicking it can change the current page (e.g. if the current page is the last one then "Next" and "Last" buttons are inactive).
 
 #### Place details
-(accessible by clicking "Details" button, or place photo, or place name on a place card):
+(accessible by clicking "Details" button, or place photo, or place name on a place card)
 1. A carousel with all images saved by all users for the place.
 2. The place name.
 3. User's own opinion ("my opinion") about the place if it exists and the user is logged in.
@@ -57,39 +57,106 @@ Besides these standard top menu and bottom footer different pages contain the fo
 7. Buttons "Back" to return to the main (Home) page and "Edit" to get to Editing of place details page.
 8. A list (if not empty) of comments about the place added by all users.
 
+#### Editing of place details
+(accessible by clicking "Edit" button on Place details page, see above\
+only if the user is logged in, otherwise the user is redirected to Log in page)
+1. An image saved by the user for the place or a placeholder if no image was saved.
+2. A text field for the place name. It can be edited only if the user added the place as a new place. This option is just for correction of misprints.
+3. A slider for setting the user's own opinion ("my opinion") about the place (if the user never added information about the place then by default 0).
+4. A text field for the country name. It can be edited only if the user added the place as a new place. This option is just for correction of misprints.
+5. A switch to indicate whether the place is visited (by default "No").
+6. A text field (optional) for a link to a website about the place.
+7. A text field (optional) for a link to a place image.
+8. Buttons "Update" to save the updated information and to return to the main page, "Cancel" to cancel changes and to return to the main page, and "Delete" for deleting information about this place saved by the user.
+9. A text field (optional) for comments about the place.
 
-#### Help page
-(accessible by clicking "Help" in menu):
+#### Adding a new place
+(accessible by clicking "Add place" in menu\
+only if the user is logged in, otherwise the user is redirected to Log in page)
+1. A text field (required) for the place name.
+2. A slider for setting the user's own opinion ("my opinion") about the place (by default 0).
+3. A text field (required) for the country name.
+4. A switch to indicate whether the place is visited (by default "No"). The user may add information about the place even before visiting it. This *a priori* opinion will be used for calculation of "Users' opinion" but not for calculation of "REC-opinion".
+5. A text field (optional) for a link to a website about the place.
+6. A text field (optional) for a link to a place image.
+7. A text field (optional) for comments about the place.
+8. Buttons "Add new place" to save the new information and to return to Home page, "Cancel" to cancel and to return to Home page.
+
+#### Selecting countries
+(accessible by clicking "Select" in menu)
+1. The page title "Select".
+2. A list of countries that can be selected (one, several, or all).
+3. Buttons "Find places" to save the selection and to get to the Selected places page, "Cancel" to cancel and to return to the main page.
+
+#### Selected places
+(accessible by clicking "Find places" on Selecting countries page, see above)
+This page is identical to Home page in all aspects except for 2 differences.
+1. The page title is "Selected places".
+2. Cards are displayed only for those places which countries were selected on Selecting countries page.
+
+#### Recommended places
+(accessible by clicking "RECommended" in menu\
+only if the user is logged in, otherwise the user is redirected to Log in page)
+This page is identical to Home page in all aspects except for 3 differences.
+1. The page title is "RECommended places".
+2. Cards are displayed only for those places for which REC-opinion can be calculated: (i) the place must not be visited by the user yet, (ii) the place must be visited by at least one user, (iii) there must be at least one place visited both by the logged in user and by at least one abovementioned user. Thus the user gets recommendations about **not yet visited** places which are **visited by other** users whose **tastes can be compared** to hers/his.
+3. Instead of generic "Users' opinion", the "REC-opinion" calculated personally for the logged in user is shown on cards. The "REC-opinion" is also shown on Place details page if it was accessed from Recommended places page.
+
+#### Login
+(accessible by clicking "Login" in menu\
+or redirected from Editing of place details, Adding a new place, or Recommended places pages if the user tried to access them without logging in\
+or redirected from Login page in case of problems with logging in)
+1. The page title is "Login".
+2. A warning message (only in case of problems with logging in).
+3. A text field (required) for the username.
+4. A text field (required) for the password.
+5. Buttons "Login" login and to return to Home page, "Cancel" to cancel and to return to Home page.
+6. Buttons "Sign Up" to get to Signup page.
+
+#### Singup
+(accessible by clicking "Sign Up" on Login page\
+or redirected from Signup page in case of problems with signing in)
+1. The page title is "Sign Up".
+2. A warning message (only in case of problems with signing up).
+3. A text field (required) for the username.
+4. A text field (required) for the password.
+5. Buttons "Sign Up" to sign up and to return to Login page, "Cancel" to cancel and to return to Login page.
+
+#### Help
+(accessible by clicking "Help" in menu)
 1. basic concepts of the site,
 2. instructions for users,
 3. contact address for complaints, suggestions, etc.
 
 
 ### Features Left to Implement:
-At the moment, a minimal usable version of the site is deployed. If there are many enough users interested in the site, many aspects can be imporved, for example:
+###### At the moment, a minimal usable version of the site is deployed. If there are many enough users interested in the site, many aspects can be imporved, for example:
 1. For each place several names can be used (e.g. names in different languages). When a user wants to add a new place the place's name is compared with place names in the database and one or several names (like Syracuse in Italy, Syracuse in NY, Syracuse in IN, etc.) of already saved places are prompted.
 2. Each user can add unlimited number of photos, website links and comments.
 3. For each place, its geographic coordinates and position on map can be added.
 4. Each item (photo, website, comment) can be rated by users. And these ratings can be used for calculation of REC-opinion.
 5. Parameters other than country name (e.g. parts of place name, range of Users' opinion, number of users who visited the place etc.) can be used for filtering place sets.
-6. Standard sign up and log in (with email address) can be implemented so that a user can change her/his username, password, get new password to replace the forgotten one etc.
-Also the site's functionality can be expanded:
+6. Standard sign up and log in (with email address) can be implemented so that a user can change her/his username, password, get new password to replace the forgotten one etc.\
+
+###### Also the site's functionality can be expanded:
 1. A trip planner can be added. A user sets departure and arrival places, total number of trip days, minimal and maximal distances for a day trip, etc. Based on these data, the site recommends possible routes with places to visit and estimates of time to spend for the visits.
 2. Other services (like sites of travel agencies, hotels or museums) can be added to such a planner.
 
 
 ## Technologies Used
-The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB. \
+The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.\
 [Bootstrap] toolkit (https://getbootstrap.com/) was used for simple and clear design.
 
 
 ## Testing
-The site was designed to be used mainly on mobile phones with a small display. \
+
+The site was designed to be used mainly on mobile phones with a small display.\
 It was tested on a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px) and a mobile phone Motorola XT1941 4.
 
 
+
 ## Deployment
-The project is deployed to Heroku (built from the master branch): \
+The project is deployed to Heroku (built from the master branch):\
 https://myRecs.herokuapp.com/ \
 The source files are publicly accessible:\
 https://github.com/pavzel/myRecs \
@@ -98,6 +165,6 @@ Private configuration variables (the link MONGO_URI that gives access to the Mon
 
 
 ## Credits
-The photos saved in the database for this project are only from open sources like Wikipedia etc. \
-The links saved in the database for this project are to open resources like Wikipedia, museum sites etc. \
-The project idea was suggested by Code Institute. \
+The photos saved in the database for this project are only from open sources like Wikipedia etc.\
+The links saved in the database for this project are to open resources like Wikipedia, museum sites etc.\
+The project idea was suggested by Code Institute.
