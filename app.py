@@ -17,6 +17,7 @@ app.secret_key = os.environ.get("SECRET")
 mongodb = PyMongo(app)
 
 
+
 def get_photos_of_best_places(value):
     # Read data about 20 places with highest opinion values
     best_places = mongodb.db.myRecPlaces.find({"opinion": { "$gte": value } }).sort("opinion", -1).limit(20)
@@ -84,6 +85,13 @@ def read_from_buffer():
     return place_opinion
 
 
+def read_from_pair_list(list_of_pairs):
+    buffer_dict = {}
+    for item in list_of_pairs:
+        buffer_dict[item[0]] = item[1]
+    return buffer_dict
+
+
 def write_to_buffer(places):
     buff_dict = []
     for place in places:
@@ -92,8 +100,35 @@ def write_to_buffer(places):
     mongodb.db.buffer.insert_many(buff_dict)
 
 
+def write_to_pair_list(mongodb_cursor):
+    buff_list = []
+    for place in mongodb_cursor:
+        buff_list.append((str(place['_id']), place['opinion']))
+    return buff_list
+
+
 def remove_from_buffer(id):
     mongodb.db.buffer.delete_one({'id': ObjectId(id)})
+
+
+def remove_from_pair_list(list_of_pairs, value0):
+    index = 0
+    for item in list_of_pairs:
+        if item[0] == value0:
+            list_of_pairs.pop(index)
+            break
+        index += 1
+    return list_of_pairs
+
+
+def update_pair_in_list(list_of_pairs, value0, value1):
+    index = 0
+    for item in list_of_pairs:
+        if item[0] == value0:
+            list_of_pairs[index] = (value0, value1)
+            break
+        index += 1
+    return list_of_pairs
 
 
 # Calculate parameters for pagination
@@ -157,6 +192,8 @@ def get_all_places():
     # Read "_id" and "opinion" for all places, save them in "buffer" collection
     places = mongodb.db.myRecPlaces.find({}, {'opinion': 1})
     write_to_buffer(places)
+    places = mongodb.db.myRecPlaces.find({}, {'opinion': 1}) #TEST
+    session['id_opinion_s'] = write_to_pair_list(places) #TEST
     # Set display parameters
     session['nav_main'] = ["active", "", "", "", "", ""]
     session['title'] = "All places:"
@@ -169,6 +206,7 @@ def get_all_places():
 def display_many_places(page_number):
     # Read from "buffer" collections pairs id/opinion and save in dictionary
     place_opinion = read_from_buffer()
+    #TEST place_opinion = read_from_pair_list(session['id_opinion_s'])
     # Calculate parameters for pagination
     session["curr_page"], max_page, index_min, index_max = get_page_params(place_opinion, page_number)
     # For places to display, prepare list of IDs "id_list"
@@ -227,6 +265,7 @@ def display_place(place_id):
     # If the place is RECommended then add REC-opinion to "place" dictionary
     if session['is_rec']:
         place_opinion = read_from_buffer()
+        #TEST place_opinion = read_from_pair_list(session['id_opinion_s'])
         rec_opinion = place_opinion[ObjectId(place_id)]
         place_dict2['rec_str'], place_dict2['rec_int'] = float_to_str_int(rec_opinion)
     # Set display parameters
@@ -290,6 +329,7 @@ def update_place(place_id):
     # Update buffer data, if necessary
     if not session['title'] == "RECommended places:":
         mongodb.db.buffer.update_one({"id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
+        update_pair_in_list(session['id_opinion_s'], place_id, opinion) #TEST
     return redirect(url_for('display_many_places', page_number=session['curr_page']))
 
 
@@ -346,6 +386,7 @@ def delete_place(place_id):
         # Delete the record form collection completely
         places.delete_one({'_id': ObjectId(place_id)})
         remove_from_buffer(place_id)
+        session['id_opinion_s'] = remove_from_pair_list(session['id_opinion_s'], place_id) #TEST
     else:
         # Delete only those data about the place that were added by logged in user
         users = place['users']
@@ -356,6 +397,7 @@ def delete_place(place_id):
         opinion = calculate_users_opinion(place['users'])
         places.update_one({"_id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
         mongodb.db.buffer.update_one({"id": ObjectId(place_id)}, {"$set": {'opinion': opinion}})
+        update_pair_in_list(session['id_opinion_s'], place_id, opinion) #TEST
     #return redirect(url_for('get_all_places'))
     return redirect(url_for('display_many_places', page_number=session['curr_page']))
 
@@ -375,6 +417,8 @@ def get_selected_places():
     selected_countries = request.form.getlist('country')
     places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}}, {'opinion': 1})
     write_to_buffer(places)
+    places = mongodb.db.myRecPlaces.find({"country": {"$in": selected_countries}}, {'opinion': 1}) #TEST
+    session['id_opinion_s'] = write_to_id_op_list(places) #TEST
     # Set display parameters
     session['nav_main'] = ["", "", "active", "", "", ""]
     session['title'] = "Selected places:"
@@ -433,6 +477,7 @@ def recommend():
             similarity[user] = 1 - pow(sum_d2 / len(opinions_to_compare), 0.5) / 6
     # Find recommended places and calculate "REC"-opinion
     recs = []
+    session["id_opinion_s"] = [] #TEST
     for place in place_dict:
         if (place in my_opinions) and my_opinions[place]['is_visited']:
             continue
@@ -447,6 +492,7 @@ def recommend():
                         sum_similarities += similarity[user]
             if sum_similarities > 0:
                 recs.append({"id": place, "opinion": round(sum_opinions / sum_similarities, 2)})
+                session["id_opinion_s"].append((str(place), round(sum_opinions / sum_similarities, 2))) #TEST
     if len(recs) > 0:
         # Save "_id" and "opinion" for RECommended places in "buffer" collection
         mongodb.db.buffer.delete_many({})
