@@ -43,20 +43,20 @@
         <div class="card-columns">
             {% for place in places %}
                     <div class="card shadow-sm mb-4">
-                        <a href="{{ url_for('display_place', place_id=place._id) }}">
+                        <a href="{{ url_for('display_one', place_id=place._id) }}">
                             <img class="card-img-top" src="{{ place.photo_url }}" class="img-fluid">
                         </a>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-8">
                                     <h5 class="card-title">
-                                        <a href="{{ url_for('display_place', place_id=place._id) }}">{{ place.place_name }}</a>
+                                        <a href="{{ url_for('display_one', place_id=place._id) }}">{{ place.place_name }}</a>
                                     </h5>
                                 </div>
                                 <div class="col-4">
                                     <div class="row justify-content-end">
                                         <a class="btn btn-primary btn-sm mr-2"
-                                            href="{{ url_for('display_place', place_id=place._id) }}" role="button">
+                                            href="{{ url_for('display_one', place_id=place._id) }}" role="button">
                                             Details
                                         </a>
                                     </div>
@@ -90,10 +90,10 @@
     <ul class="pagination pagination-sm justify-content-center pb-5">
         {% if (session['curr_page'] > 1) %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('display_many_places', page_number=1) }}">First</a>
+                <a class="page-link" href="{{ url_for('display_many', page=1) }}">First</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('display_many_places', page_number=session['curr_page']-1) }}">Previous</a>
+                <a class="page-link" href="{{ url_for('display_many', page=session['curr_page']-1) }}">Previous</a>
             </li>
         {% else %}
             <li class="page-item disabled"><a class="page-link" href="">First</a></li>
@@ -104,10 +104,10 @@
         </li>
         {% if (session['curr_page'] < max_page) %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('display_many_places', page_number=session['curr_page']+1) }}">Next</a>
+                <a class="page-link" href="{{ url_for('display_many', page=session['curr_page']+1) }}">Next</a>
             </li>
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('display_many_places', page_number=max_page) }}">Last ({{ max_page }})</a>
+                <a class="page-link" href="{{ url_for('display_many', page=max_page) }}">Last ({{ max_page }})</a>
             </li>
         {% else %}
             <li class="page-item disabled"><a class="page-link" href="">Next</a></li>
