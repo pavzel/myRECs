@@ -109,7 +109,7 @@ def write_to_pair_list(mongodb_cursor):
         buff_list.append((str(place['_id']), place['opinion']))
     return buff_list
 
-#TEST!!!
+
 def read_from_pair_list(list_of_pairs):
     """Save pairs id/opinion from a list in a dictionary.
 
@@ -319,20 +319,19 @@ def display_many(page):
 
 @app.route('/place/<place_id>')
 def display_one(place_id):
+    """ Save all data about a place in a dictionary dict1. """
+    place = mongodb.db.myRecPlaces.find_one({'_id': ObjectId(place_id)})
+    dict1 = {}
+    for key in place:
+        dict1[key] = place[key]
     place_id = str(place_id)
 
     """ Check if user is logged in ("editor"). """
     editor = session['loggedin_usr'] if 'loggedin_usr' in session else None
 
-    # Get data about a place
-    place = mongodb.db.myRecPlaces.find_one({'_id': ObjectId(place_id)})
-    # Save data in a dictionary
-    place_dict = {}
-    for key in place:
-        place_dict[key] = place[key]
-    # Compose a dictionary with data for display
+    """ Prepare a dictionary dict2 with data for display. """
     dict2 = {}
-    dict2['_id'] = place_dict['_id']
+    dict2['_id'] = dict1['_id']
     if editor is not None:
         if editor in place['users']:
             dict2['status'] = 'contributor'
@@ -340,17 +339,17 @@ def display_one(place_id):
             dict2['status'] = 'visitor'
     else:
         dict2['status'] = 'anonymous'
-    dict2['place_name'] = place_dict['place_name']
-    dict2['country'] = place_dict['country']
+    dict2['place_name'] = dict1['place_name']
+    dict2['country'] = dict1['country']
     if dict2['status'] == 'contributor':
-        dict2['my_opinion'] = int(
-            place_dict['users'][editor]['my_opinion'])
-        dict2['is_visited'] = place_dict['users'][editor]['is_visited']
-    # Collect photos, websites and comment added by all users
+        dict2['my_opinion'] = int(dict1['users'][editor]['my_opinion'])
+        dict2['is_visited'] = dict1['users'][editor]['is_visited']
+    
+    """ Collect photos, websites and comments added by all users. """
     dict2['photo_urls'] = []
     dict2['websites'] = []
     dict2['comments'] = []
-    users = place_dict['users']
+    users = dict1['users']
     for user in users:
         if users[user]['photo_url'] != '':
             dict2['photo_urls'].append(users[user]['photo_url'])
@@ -358,13 +357,12 @@ def display_one(place_id):
             dict2['websites'].append(users[user]['website'])
         if users[user]['comment'] != '':
             dict2['comments'].append(users[user]['comment'])
-    # If there is no photo yet, add a placeholder
     if not dict2['photo_urls']:
         dict2['photo_urls'] = [PLACEHOLD]
-    # Add users' opinion
+
+    """ Add opinions. """
     dict2['opinion_str'], dict2['opinion_int'] = float_to_str_int(
         calculate_users_opinion(users))
-    # If the place is RECommended then add REC-opinion to "place" dictionary
     if session['is_rec']:
         place_opinion = read_from_pair_list(session['id_opinion_s'])
         rec_opinion = place_opinion[place_id]
@@ -726,4 +724,4 @@ if __name__ == '__main__':
     app.run(
         host=os.environ.get('IP'),
         port=os.environ.get('PORT'),
-        debug=True)
+        debug=False)
