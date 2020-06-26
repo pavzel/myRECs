@@ -32,7 +32,7 @@ def get_random_photo(users):
             a key is a user's name.
 
     Returns:
-        output_url (str): A string with URL of a photo,
+        users_photos[0] (str): A string with URL of a photo.
             None if no photo was saved for the place.
 
     """
@@ -42,11 +42,10 @@ def get_random_photo(users):
         if photo_url != '':
             users_photos.append(users[user]['photo_url'])
     random.shuffle(users_photos)
-    if len(users_photos) == 0:
-        output_url = None
+    if users_photos:
+        return users_photos[0]
     else:
-        output_url = users_photos[0]
-    return output_url
+        return None
 
 
 def get_photos_of_best_places(value):
@@ -69,7 +68,7 @@ def get_photos_of_best_places(value):
     best_place_images = []
     for place in best_places:
         place_photo = get_random_photo(place['users'])
-        if place_photo:
+        if place_photo is not None:
             best_place_images.append(place_photo)
     random.shuffle(best_place_images)
     return best_place_images[0:3]
@@ -99,11 +98,6 @@ def float_to_str_int(opinion):
         opinion_str = str(round(opinion, 2))
     opinion_int = int(round(opinion))
     return opinion_str, opinion_int
-
-
-def get_users_opinion(users):
-    users_opinion = calculate_users_opinion(users)
-    return float_to_str_int(users_opinion)
 
 
 def read_from_pair_list(list_of_pairs):
@@ -252,7 +246,7 @@ def display_place(place_id):
     # Compose a dictionary with data for display
     dict2 = {}
     dict2['_id'] = place_dict['_id']
-    if editor:
+    if editor is not None:
         if editor in place['users']:
             dict2['status'] = 'contributor'
         else:
@@ -278,11 +272,11 @@ def display_place(place_id):
         if users[user]['comment'] != '':
             dict2['comments'].append(users[user]['comment'])
     # If there is no photo yet, add a placeholder
-    if len(dict2['photo_urls']) == 0:
+    if not dict2['photo_urls']:
         dict2['photo_urls'] = [PLACEHOLD]
     # Add users' opinion
-    dict2['opinion_str'], dict2['opinion_int'] = get_users_opinion(
-        users)
+    dict2['opinion_str'], dict2['opinion_int'] = float_to_str_int(
+        calculate_users_opinion(users))
     # If the place is RECommended then add REC-opinion to "place" dictionary
     if session['is_rec']:
         place_opinion = read_from_pair_list(session['id_opinion_s'])
@@ -362,7 +356,7 @@ def update_place(place_id):
             'opinion': opinion}
         })
     # Update buffer data, if necessary
-    if not session['title'] == 'RECommended places:':
+    if session['title'] != 'RECommended places:':
         session['id_opinion_s'] = update_pair_in_list(
             session['id_opinion_s'], place_id, opinion)
     return redirect(url_for(
@@ -516,7 +510,7 @@ def recommend():
                         user_opinion = user_opinions[place]['opinion']
                         opinions_to_compare.append(
                             {'my': my_opinion, 'other': user_opinion})
-        if len(opinions_to_compare) > 0:
+        if opinions_to_compare:
             sum_d2 = 0
             for opinion_pair in opinions_to_compare:
                 sum_d2 += pow(opinion_pair['my'] - opinion_pair['other'], 2)
@@ -540,7 +534,7 @@ def recommend():
             if sum_similarities > 0:
                 session['id_opinion_s'].append(
                     (str(place), round(sum_opinions / sum_similarities, 2)))
-    if len(session['id_opinion_s']) > 0:
+    if session['id_opinion_s']:
         # Set display parameters
         session['nav_main'] = ['', '', '', 'active', '', '']
         session['title'] = 'RECommended places:'
@@ -607,7 +601,7 @@ def insert_user():
     users = mongodb.db.users
     if users.count_documents({'username': username}) == 0:
         users.insert_one({'username': username, 'password': password})
-        return redirect(url_for('login', login_problem = False))
+        return redirect(url_for('login', login_problem=False))
     return render_template(
         'signup.html',
         signup_problem=True,
