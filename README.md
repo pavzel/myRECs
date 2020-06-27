@@ -23,7 +23,7 @@ A place is rated by a user according to a scale:\
     -3 means "never go there"\
     -2 means "uninteresting and unfriendly"\
     -1 means "boring"\
-    &emsp;0 means "rather nice but nothing special"\
+    &nbsp;0 means "rather nice but nothing special"\
     +1 means "interesting or especially nice"\
     +2 means "very interesting"\
     +3 means "outstanding/unique"\
