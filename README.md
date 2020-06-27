@@ -201,7 +201,7 @@ or redirected from Signup page in case of problems with signing in)
 
 ## Technologies Used
 * The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.
-* [Bootstrap] toolkit (https://getbootstrap.com/) was used for simple and clear design.
+* [Bootstrap](https://getbootstrap.com/) toolkit was used for simple and clear design.
 
 
 ## Testing
@@ -216,7 +216,7 @@ It was tested on a mobile phone Motorola XT1941 4 and a laptop Lenovo ThinkPad (
 
 ## Deployment
 * The project is deployed to Heroku (built from the master branch): https://myRecs.herokuapp.com/
-* The source files are publicly accessible: https://github.com/pavzel/myRecs \
+* The source files are publicly accessible: https://github.com/pavzel/myRecs
 * To run locally, you can clone this repository: paste `git clone https://github.com/pavzel/myRecs.git` into your terminal. To cut ties with this GitHub repository, type `git remote rm origin` into the terminal.
 * Private configuration variables (the link MONGO_URI that gives access to the MongoDB database, and the secret key SECRET used by Flask app) are not revealed.
 
