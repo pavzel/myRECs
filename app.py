@@ -126,12 +126,12 @@ def read_from_pair_list(list_of_pairs):
     return buffer_dict
 
 
-def remove_from_pair_list(list_of_pairs, value0):
+def remove_from_pair_list(list_of_pairs, index_id):
     """Remove a pair id/opinion from a list.
 
     Args:
         list_of_pairs (list): [id, opinion],
-        value0 (str): id value in the target pair.
+        index_id (str): id value in the target pair.
 
     Returns:
         list_of_pairs (list): a list without the target pair.
@@ -139,20 +139,20 @@ def remove_from_pair_list(list_of_pairs, value0):
     """
     index = 0
     for item in list_of_pairs:
-        if item[0] == value0:
+        if item[0] == index_id:
             list_of_pairs.pop(index)
             break
         index += 1
     return list_of_pairs
 
 
-def update_pair_in_list(list_of_pairs, value0, value1):
+def update_pair_in_list(list_of_pairs, index_id, value):
     """Update a pair id/opinion in a list.
 
     Args:
         list_of_pairs (list): [id, opinion],
-        value0 (str): id value in the target pair,
-        value1 (float): new opinion value in the target pair.
+        index_id (str): id value in the target pair,
+        value (float): new opinion value in the target pair.
 
     Returns:
         list_of_pairs (list): the updated list.
@@ -160,8 +160,8 @@ def update_pair_in_list(list_of_pairs, value0, value1):
     """
     index = 0
     for item in list_of_pairs:
-        if item[0] == value0:
-            list_of_pairs[index] = (value0, value1)
+        if item[0] == index_id:
+            list_of_pairs[index] = (index_id, value)
             break
         index += 1
     return list_of_pairs
@@ -175,10 +175,11 @@ def get_page_params(total_number_of_places, page):
         page (int): number of the page to be displayed.
 
     Returns:
-        cur_page (int): new value for the current page,
-        max_page (int): the maximal page number,
-        index_min (int): the lower index in the place list,
-        index_max (int): the upper index in the place list.
+        (tuple):
+            cur_page (int): new value for the current page,
+            max_page (int): the maximal page number,
+            index_min (int): the lower index in the place list,
+            index_max (int): the upper index in the place list.
 
     """
     PER_PAGE = 15
@@ -217,6 +218,7 @@ def float_to_str_int(opinion):
         opinion (float): opinion for a place.
 
     Returns:
+        (tuple):
         opinion_str (str): opinion with a sign and 2 decimals,
         opinion_int (int): integer for conversion to thumbs up/down.
 
@@ -288,11 +290,11 @@ def update_countries(country):
 
 @app.route('/')
 def get_all_places():
-    """ Prepare list of all places. """
+    # Prepare list of all places.
     places = mongodb.db.myRecPlaces.find({}, {'opinion': 1})
     session['id_opinion_s'] = write_to_pair_list(places)
 
-    """ Redirect to display all places. """
+    # Redirect to display all places.
     session['nav_main'] = ['active', '', '', '', '', '']
     session['title'] = 'All places:'
     session['curr_page'] = 1
@@ -307,7 +309,7 @@ def display_many(page):
     id_op_list = get_id_op_list(session['id_opinion_s'], index_min, index_max)
     display_list = prepare_display_list(id_op_list, session['is_rec'])
 
-    """ Display many places. """
+    # Display many places.
     session['nav_curr'] = session['nav_main']
     return render_template(
         'places.html',
@@ -319,17 +321,17 @@ def display_many(page):
 
 @app.route('/place/<place_id>')
 def display_one(place_id):
-    """ Save all data about a place in a dictionary dict1. """
+    # Save all data about a place in a dictionary dict1.
     place = mongodb.db.myRecPlaces.find_one({'_id': ObjectId(place_id)})
     dict1 = {}
     for key in place:
         dict1[key] = place[key]
     place_id = str(place_id)
 
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     editor = session['loggedin_usr'] if 'loggedin_usr' in session else None
 
-    """ Prepare a dictionary dict2 with data for display. """
+    # Prepare a dictionary dict2 with data for display.
     dict2 = {}
     dict2['_id'] = dict1['_id']
     if editor is not None:
@@ -345,7 +347,7 @@ def display_one(place_id):
         dict2['my_opinion'] = int(dict1['users'][editor]['my_opinion'])
         dict2['is_visited'] = dict1['users'][editor]['is_visited']
     
-    """ Collect photos, websites and comments added by all users. """
+    # Collect photos, websites and comments added by all users.
     dict2['photo_urls'] = []
     dict2['websites'] = []
     dict2['comments'] = []
@@ -360,7 +362,7 @@ def display_one(place_id):
     if not dict2['photo_urls']:
         dict2['photo_urls'] = [PLACEHOLD]
 
-    """ Add opinions. """
+    # Add opinions.
     dict2['opinion_str'], dict2['opinion_int'] = float_to_str_int(
         calculate_users_opinion(users))
     if session['is_rec']:
@@ -368,21 +370,21 @@ def display_one(place_id):
         rec_opinion = place_opinion[place_id]
         dict2['rec_str'], dict2['rec_int'] = float_to_str_int(rec_opinion)
 
-    """ Display details of one place. """
+    # Display details of one place.
     session['nav_curr'] = ['', '', '', '', '', '']
     return render_template('place.html', place=dict2, session=session)
 
 
 @app.route('/edit_place/<place_id>')
 def edit_place(place_id):
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     if 'loggedin_usr' in session:
         editor = session['loggedin_usr']
     else:
         return redirect(url_for('login', login_problem=False))
 
     place = mongodb.db.myRecPlaces.find_one({'_id': ObjectId(place_id)})
-    """ If no data added by the user before then initialize. """
+    # If no data added by the user before then initialize.
     if not (editor in place['users']):
         is_new = True
         new_user = {}
@@ -400,7 +402,7 @@ def edit_place(place_id):
     else:
         is_new = False
 
-    """ Display a form for editing details of one place. """
+    # Display a form for editing details of one place.
     session['nav_curr'] = ['', '', '', '', '', '']
     return render_template(
         'editplace.html',
@@ -412,14 +414,14 @@ def edit_place(place_id):
 
 @app.route('/update_place/<place_id>', methods=['POST'])
 def update_place(place_id):
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     if 'loggedin_usr' in session:
         editor = session['loggedin_usr']
     else:
         return redirect(url_for('login', login_problem=False))
 
     places = mongodb.db.myRecPlaces
-    """ Update user-specific data. """
+    # Update user-specific data.
     place = places.find_one({'_id': ObjectId(place_id)})
     users = place['users']
     users[editor] = {
@@ -433,7 +435,7 @@ def update_place(place_id):
         {'_id': ObjectId(place_id)},
         {'$set': {'users': users}})
 
-    """ Update general data. """
+    # Update general data.
     country = request.form.get('country')
     opinion = calculate_users_opinion(users)
     places.update_one(
@@ -444,32 +446,34 @@ def update_place(place_id):
             'opinion': opinion}
         })
 
-    """ Update "countries" collection if necessary. """
+    # Update "countries" collection if necessary.
     update_countries(country)
 
-    """ Redirect to display places. """
+    # Redirect to display places.
     if session['title'] != 'RECommended places:':
+        print("id_opinion_s BEFORE: ", session['id_opinion_s'])
         session['id_opinion_s'] = update_pair_in_list(
             session['id_opinion_s'], place_id, opinion)
+        print("id_opinion_s AFTER: ", session['id_opinion_s'])
     return redirect(url_for('display_many', page=session['curr_page']))
 
 
 @app.route('/add_place')
 def add_place():
-    """ Display a form for adding a new place. """
+    # Display a form for adding a new place.
     session['nav_curr'] = ['', 'active', '', '', '', '']
     return render_template('addplace.html', session=session)
 
 
 @app.route('/insert_place', methods=['POST'])
 def insert_place():
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     if 'loggedin_usr' in session:
         editor = session['loggedin_usr']
     else:
         return redirect(url_for('login', login_problem=False))
 
-    """ Save data from form as new place. """
+    # Save data from form as new place.
     country = request.form.get('country')
     opinion = float(request.form.get('my_opinion'))
     my_opinion = int(opinion)
@@ -490,37 +494,37 @@ def insert_place():
         }
     })
 
-    """ Update "countries" collection if necessary. """
+    # Update "countries" collection if necessary.
     update_countries(country)
 
-    """ Redirect to display places. """
+    # Redirect to display all places.
     return redirect(url_for('get_all_places'))
 
 
 @app.route('/delete_place/<place_id>')
 def delete_place(place_id):
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     if 'loggedin_usr' in session:
         editor = session['loggedin_usr']
     else:
         return redirect(url_for('login', login_problem=False))
 
-    """ Delete user's record about the place. """
+    # Delete user's record about the place.
     places = mongodb.db.myRecPlaces
     place = places.find_one({'_id': ObjectId(place_id)})
     if editor == place['added_by']:
-        """ Delete the record form collection completely. """
+        # Delete the record form collection completely.
         places.delete_one({'_id': ObjectId(place_id)})
         session['id_opinion_s'] = remove_from_pair_list(
             session['id_opinion_s'], place_id)
     else:
-        """ Delete only data about the place added by editor. """
+        # Delete only data about the place added by editor.
         users = place['users']
         users.pop(editor)
         places.update_one(
             {'_id': ObjectId(place_id)},
             {'$set': {'users': users}})
-        """ Update users' opinion for the place. """
+        # Update Users' opinion for the place.
         place = places.find_one({'_id': ObjectId(place_id)})
         opinion = calculate_users_opinion(place['users'])
         places.update_one(
@@ -529,7 +533,7 @@ def delete_place(place_id):
         session['id_opinion_s'] = update_pair_in_list(
             session['id_opinion_s'], place_id, opinion)
 
-    """ Redirect to display places. """
+    # Redirect to display places.
     return redirect(url_for('display_many', page=session['curr_page']))
 
 
@@ -545,14 +549,14 @@ def select():
 
 @app.route('/get_selested_places', methods=['POST'])
 def get_selected_places():
-    """ Prepare list of places for selected countries. """
+    # Prepare list of places for selected countries.
     selected_countries = request.form.getlist('country')
     places = mongodb.db.myRecPlaces.find(
         {'country': {'$in': selected_countries}},
         {'opinion': 1})
     session['id_opinion_s'] = write_to_pair_list(places)
 
-    """ Redirect to display selected places. """
+    # Redirect to display selected places.
     session['nav_main'] = ['', '', 'active', '', '', '']
     session['title'] = 'Selected places:'
     session['curr_page'] = 1
@@ -562,27 +566,25 @@ def get_selected_places():
 
 @app.route('/recommend')
 def recommend():
-    """ Check if user is logged in ("editor"). """
+    # Check if user is logged in ("editor").
     if 'loggedin_usr' in session:
         editor = session['loggedin_usr']
     else:
         return redirect(url_for('login', login_problem=False))
 
-    """ Save data about all places in "place_dict" dictionary. """
+    # Save data about all places in "place_dict" dictionary.
     place_dict = {}
     places = mongodb.db.myRecPlaces.find({}, {'users': 1})
     for place in places:
         place_dict[place['_id']] = place['users']
 
-    """ Prepare "user_dict" for opinions of individual users. """
+    # Prepare "user_dict" for opinions of individual users.
     user_dict = {}
     users = mongodb.db.users.find({}, {'username': 1})
     for user in users:
         user_dict[user['username']] = {}
 
-    """
-    For each user save 'is_visited' and 'my_opinion' in "user_dict".
-    """
+    # For each user save 'is_visited' and 'my_opinion' in "user_dict".
     for place in place_dict:
         users_in_place = place_dict[place]
         for user in user_dict:
@@ -593,11 +595,11 @@ def recommend():
                     'opinion': user_in_place['my_opinion']
                 }
 
-    """ Separate editor's data from the other users' data """
+    # Separate editor's data from the other users' data.
     my_opinions = user_dict[editor]
     user_dict.pop(editor)
 
-    """ Calculate similarities. """
+    # Calculate similarities.
     similarity = {}
     for user in user_dict:
         user_opinions = user_dict[user]
@@ -617,7 +619,7 @@ def recommend():
             similarity[user] = 1 - pow(sum_d2
                                        / len(opinions_to_compare), 0.5) / 6
 
-    """ Prepare list of RECommended places with REC-opinions. """
+    # Prepare list of RECommended places with REC-opinions.
     session['id_opinion_s'] = []
     for place in place_dict:
         if (place in my_opinions) and my_opinions[place]['is_visited']:
@@ -636,7 +638,7 @@ def recommend():
                 session['id_opinion_s'].append(
                     (str(place), round(sum_opinions / sum_similarities, 2)))
 
-    """ Redirect to display RECommended places if any, or all. """
+    # Redirect to display RECommended places if any, or all.
     if session['id_opinion_s']:
         session['nav_main'] = ['', '', '', 'active', '', '']
         session['title'] = 'RECommended places:'
@@ -649,7 +651,7 @@ def recommend():
 
 @app.route('/login/<login_problem>')
 def login(login_problem):
-    """ Display a form for log in. """
+    # Display a form for log in.
     session['nav_curr'] = ['', '', '', '', 'active', '']
     return render_template(
         'login.html',
@@ -659,11 +661,11 @@ def login(login_problem):
 
 @app.route('/sign_in', methods=['POST'])
 def sign_in():
-    """ Get login data from form. """
+    # Get login data from form.
     username = request.form.get('username')
     password = request.form.get('password')
 
-    """ If username and password are valid then sign in. """
+    # If username and password are valid then sign in.
     users = mongodb.db.users
     if users.count_documents({'username': username}) == 1:
         user = users.find_one({'username': username})
@@ -671,7 +673,7 @@ def sign_in():
             session['loggedin_usr'] = username
             return redirect(url_for('get_all_places'))
 
-    """ If problems with sign in then inform and try again. """
+    # If problems with sign in then inform and try again.
     return render_template(
         'login.html',
         login_problem=True,
@@ -686,7 +688,7 @@ def logout():
 
 @app.route('/sign_up/<signup_problem>')
 def sign_up(signup_problem):
-    """ Display a form for sign up. """
+    # Display a form for sign up.
     session['nav_curr'] = ['', '', '', '', 'active', '']
     return render_template(
         'signup.html',
@@ -696,17 +698,17 @@ def sign_up(signup_problem):
 
 @app.route('/insert_user', methods=['POST'])
 def insert_user():
-    """ Get user's data from form. """
+    # Get user's data from form.
     username = request.form.get('username')
     password = request.form.get('password')
 
-    """ If username is valid then redirect to sign in. """
+    # If username is valid then redirect to sign in.
     users = mongodb.db.users
     if users.count_documents({'username': username}) == 0:
         users.insert_one({'username': username, 'password': password})
         return redirect(url_for('login', login_problem=False))
 
-    """ If problems with sign up then inform and try again. """
+    # If problems with sign up then inform and try again.
     return render_template(
         'signup.html',
         signup_problem=True,
@@ -715,7 +717,7 @@ def insert_user():
 
 @app.route('/help')
 def help():
-    """ Display Help Page. """
+    # Display Help Page.
     session['nav_curr'] = ['', '', '', '', '', 'active']
     return render_template('help.html', session=session)
 
