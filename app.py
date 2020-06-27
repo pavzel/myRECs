@@ -2,7 +2,7 @@ import os
 import math
 import random
 
-from functools import wraps #TEST
+from functools import wraps
 from flask import Flask, render_template, redirect, request, url_for, session
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
@@ -456,10 +456,8 @@ def update_place(place_id):
 
     # Redirect to display places.
     if session['title'] != 'RECommended places:':
-        print("id_opinion_s BEFORE: ", session['id_opinion_s'])
         session['id_opinion_s'] = update_pair_in_list(
             session['id_opinion_s'], place_id, opinion)
-        print("id_opinion_s AFTER: ", session['id_opinion_s'])
     return redirect(url_for('display_many', page=session['curr_page']))
 
 
