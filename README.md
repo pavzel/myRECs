@@ -31,14 +31,6 @@ A user can see own opinion ("my opinion"; if there is any) and "Users' opinion" 
 
 
 ## UX
-Use this section to provide insight into your UX process, focusing on who this website is for, what it is that they want to achieve and how your project is the best way to help them achieve these things.
-
-In particular, as part of this section we recommend that you provide a list of User Stories, with the following general structure:
-
-As a user type, I want to perform an action, so that I can achieve a goal.
-
-
-## UX
 At the moment, the site was supposed to be used by me, my friends, and maybe friends of friends. That is why its design is minimal and includes only essential feratures.
 ### User stories:
 #### Always visible "Navigation menu"
@@ -208,8 +200,8 @@ or redirected from Signup page in case of problems with signing in)
 
 
 ## Technologies Used
-The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.\
-[Bootstrap] toolkit (https://getbootstrap.com/) was used for simple and clear design.
+* The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.
+* [Bootstrap] toolkit (https://getbootstrap.com/) was used for simple and clear design.
 
 
 ## Testing
@@ -219,19 +211,17 @@ An attempt to sign up with an already used username resulted in a warning messag
 An attempt to use edit/add/recommended functionality without logging in resulted in redirect to Login page.
 
 The site was designed to be used mainly on mobile phones with a small display.\
-It was tested on a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px) and a mobile phone Motorola XT1941 4.
+It was tested on a mobile phone Motorola XT1941 4 and a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px).
 
 
 ## Deployment
-The project is deployed to Heroku (built from the master branch):\
-https://myRecs.herokuapp.com/ \
-The source files are publicly accessible:\
-https://github.com/pavzel/myRecs \
-To run locally, you can clone this repository: paste `git clone https://github.com/pavzel/myRecs.git` into your terminal. To cut ties with this GitHub repository, type `git remote rm origin` into the terminal.
-Private configuration variables (the link MONGO_URI that gives access to the MongoDB database, and the secret key SECRET used by Flask app) are not revealed.
+* The project is deployed to Heroku (built from the master branch): https://myRecs.herokuapp.com/
+* The source files are publicly accessible: https://github.com/pavzel/myRecs \
+* To run locally, you can clone this repository: paste `git clone https://github.com/pavzel/myRecs.git` into your terminal. To cut ties with this GitHub repository, type `git remote rm origin` into the terminal.
+* Private configuration variables (the link MONGO_URI that gives access to the MongoDB database, and the secret key SECRET used by Flask app) are not revealed.
 
 
 ## Credits
-The photos saved in the database for this project are only from open sources like Wikipedia etc.\
-The links saved in the database for this project are to open resources like Wikipedia, museum sites etc.\
-The project idea was suggested by Code Institute.
+* The photos saved in the database for this project are only from open sources like Wikipedia etc.
+* The links saved in the database for this project are to open resources like Wikipedia, museum sites etc.
+* The project idea was suggested by Code Institute.
