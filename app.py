@@ -2,6 +2,7 @@ import os
 import math
 import random
 
+from functools import wraps #TEST
 from flask import Flask, render_template, redirect, request, url_for, session
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
@@ -20,6 +21,16 @@ app.config['MONGO_URI'] = os.environ.get('MONGO_URI')
 app.secret_key = os.environ.get('SECRET')
 
 mongodb = PyMongo(app)
+
+
+# Adapted from https://flask.palletsprojects.com/
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session['loggedin_usr'] is None:
+            return redirect(url_for('login', login_problem=False))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def get_random_photo(users):
@@ -376,14 +387,11 @@ def display_one(place_id):
 
 
 @app.route('/edit_place/<place_id>')
+@login_required
 def edit_place(place_id):
-    # Check if user is logged in ("editor").
-    if 'loggedin_usr' in session:
-        editor = session['loggedin_usr']
-    else:
-        return redirect(url_for('login', login_problem=False))
-
+    editor = session['loggedin_usr']
     place = mongodb.db.myRecPlaces.find_one({'_id': ObjectId(place_id)})
+
     # If no data added by the user before then initialize.
     if not (editor in place['users']):
         is_new = True
@@ -413,14 +421,11 @@ def edit_place(place_id):
 
 
 @app.route('/update_place/<place_id>', methods=['POST'])
+@login_required
 def update_place(place_id):
-    # Check if user is logged in ("editor").
-    if 'loggedin_usr' in session:
-        editor = session['loggedin_usr']
-    else:
-        return redirect(url_for('login', login_problem=False))
-
+    editor = session['loggedin_usr']
     places = mongodb.db.myRecPlaces
+
     # Update user-specific data.
     place = places.find_one({'_id': ObjectId(place_id)})
     users = place['users']
@@ -466,12 +471,9 @@ def add_place():
 
 
 @app.route('/insert_place', methods=['POST'])
+@login_required
 def insert_place():
-    # Check if user is logged in ("editor").
-    if 'loggedin_usr' in session:
-        editor = session['loggedin_usr']
-    else:
-        return redirect(url_for('login', login_problem=False))
+    editor = session['loggedin_usr']
 
     # Save data from form as new place.
     country = request.form.get('country')
@@ -502,12 +504,9 @@ def insert_place():
 
 
 @app.route('/delete_place/<place_id>')
+@login_required
 def delete_place(place_id):
-    # Check if user is logged in ("editor").
-    if 'loggedin_usr' in session:
-        editor = session['loggedin_usr']
-    else:
-        return redirect(url_for('login', login_problem=False))
+    editor = session['loggedin_usr']
 
     # Delete user's record about the place.
     places = mongodb.db.myRecPlaces
@@ -565,12 +564,9 @@ def get_selected_places():
 
 
 @app.route('/recommend')
+@login_required
 def recommend():
-    # Check if user is logged in ("editor").
-    if 'loggedin_usr' in session:
-        editor = session['loggedin_usr']
-    else:
-        return redirect(url_for('login', login_problem=False))
+    editor = session['loggedin_usr']
 
     # Save data about all places in "place_dict" dictionary.
     place_dict = {}
