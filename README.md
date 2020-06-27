@@ -23,7 +23,7 @@ A place is rated by a user according to a scale:\
     -3 means "never go there"\
     -2 means "uninteresting and unfriendly"\
     -1 means "boring"\
-     0 means "rather nice but nothing special"\
+    &emsp;0 means "rather nice but nothing special"\
     +1 means "interesting or especially nice"\
     +2 means "very interesting"\
     +3 means "outstanding/unique"\
@@ -200,7 +200,7 @@ or redirected from Signup page in case of problems with signing in)
 3. For each place, its geographic coordinates and position on map can be added.
 4. Each item (photo, website, comment) can be rated by users. And these ratings can be used for calculation of REC-opinion.
 5. Parameters other than country name (e.g. parts of place name, range of Users' opinion, number of users who visited the place etc.) can be used for filtering place sets.
-6. Standard sign up and log in (with email address) can be implemented so that a user can change her/his username, password, get new password to replace the forgotten one etc.\
+6. Standard sign up and log in (with email address) can be implemented so that a user can change her/his username, password, get new password to replace the forgotten one etc.
 
 **Also the site's functionality can be expanded:**
 1. A trip planner can be added. A user sets departure and arrival places, total number of trip days, minimal and maximal distances for a day trip, etc. Based on these data, the site recommends possible routes with places to visit and estimates of time to spend for the visits.
@@ -216,11 +216,10 @@ The project was written with HTML5, CSS3, Javascript, Pyhton3, Flask, MongoDB.\
 The site was tested manually according to User stories (see UX section above).\
 The site behaved as expected (as described in User stories) when entered information was valid. If the required information was missing (e.g. username and/or password on Signup page), a warning message appeared and the site waited for valid input.\
 An attempt to sign up with an already used username resulted in a warning message and return to the sign up form. Similarly, an attempt to log in with erroneous username and/or password resulted in a warning message and return to the log in form.\
-An attempt to use edit/add/recommended functionality without logging in resulted in redirect to Login page.\
+An attempt to use edit/add/recommended functionality without logging in resulted in redirect to Login page.
 
 The site was designed to be used mainly on mobile phones with a small display.\
 It was tested on a laptop Lenovo ThinkPad (with different window widths from 330px to 1466px) and a mobile phone Motorola XT1941 4.
-
 
 
 ## Deployment
